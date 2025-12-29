@@ -70,7 +70,7 @@ This implementation plan breaks down the prompt card rendering feature into disc
   - **Property 3: Component Consistency**
   - **Validates: Requirements 1.2**
 
-- [ ] 5. Create dedicated prompts page
+- [x] 5. Create dedicated prompts page
   - Create `app/prompts/page.tsx` as a Server Component
   - Display all prompts from all libraries using PromptsGrid
   - Implement proper sorting by creation date (newest first)
