@@ -4,8 +4,12 @@ import type { Prompt } from '@/lib/types/content'
 
 // Mock the git utility functions
 jest.mock('@/lib/utils/git-extractor', () => ({
-  formatGitDate: jest.fn((date: string) => 'Jan 15, 2024'),
   getShortHash: jest.fn((hash: string) => hash.substring(0, 7))
+}))
+
+// Mock the date formatter functions
+jest.mock('@/lib/utils/date-formatter', () => ({
+  getFormattedDisplayDate: jest.fn(() => 'Jan 15, 2024')
 }))
 
 // Mock the badge utility functions

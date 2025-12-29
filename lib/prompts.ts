@@ -1,6 +1,7 @@
 import 'server-only'
 import { cache } from 'react'
 import { readPromptzLibrary } from './content-service'
+import { compareDatesNewestFirst } from './utils/date-formatter'
 import type { Prompt } from './types/content'
 
 /**
@@ -19,7 +20,7 @@ export const getAllPrompts = cache(async (): Promise<Prompt[]> => {
     return allPrompts.sort((a, b) => {
       const dateA = a.git?.createdDate || a.date
       const dateB = b.git?.createdDate || b.date
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
+      return compareDatesNewestFirst(dateA, dateB)
     })
     
   } catch (error) {

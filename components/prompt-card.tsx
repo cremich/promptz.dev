@@ -1,8 +1,8 @@
-import * as React from "react"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatGitDate, getShortHash } from "@/lib/utils/git-extractor"
+import { getShortHash } from "@/lib/utils/git-extractor"
+import { getFormattedDisplayDate } from "@/lib/utils/date-formatter"
 import { 
   getContentTypeBadgeVariant, 
   getLibraryBadgeVariant, 
@@ -27,8 +27,7 @@ export function PromptCard({ prompt, className }: PromptCardProps) {
   
   // Use git information if available, otherwise fall back to frontmatter
   const displayAuthor = prompt.git?.author || prompt.author
-  const displayDate = prompt.git?.createdDate || prompt.date
-  const formattedDate = formatGitDate(displayDate)
+  const formattedDate = getFormattedDisplayDate(prompt.git?.createdDate, prompt.date)
 
   return (
     <Card className={className}>
