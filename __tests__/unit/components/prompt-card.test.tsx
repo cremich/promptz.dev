@@ -8,6 +8,25 @@ jest.mock('@/lib/utils/git-extractor', () => ({
   getShortHash: jest.fn((hash: string) => hash.substring(0, 7))
 }))
 
+// Mock the badge utility functions
+jest.mock('@/lib/utils/badge-utils', () => ({
+  getContentTypeBadgeVariant: jest.fn(() => ({ variant: 'secondary' })),
+  getLibraryBadgeVariant: jest.fn(() => ({ variant: 'outline' })),
+  getLibraryName: jest.fn((path: string) => {
+    const pathParts = path.split('/')
+    const librariesIndex = pathParts.indexOf('libraries')
+    if (librariesIndex !== -1 && librariesIndex + 1 < pathParts.length) {
+      return pathParts[librariesIndex + 1]
+    }
+    return 'unknown'
+  }),
+  getBadgeArrangement: jest.fn(() => ({
+    containerClasses: 'flex flex-wrap gap-1 shrink-0',
+    badgeClasses: 'text-xs font-medium'
+  })),
+  getStandardBadgeClasses: jest.fn(() => 'text-xs font-medium')
+}))
+
 describe('PromptCard', () => {
   const mockPrompt: Prompt = {
     id: 'test-prompt',

@@ -3,6 +3,13 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatGitDate, getShortHash } from "@/lib/utils/git-extractor"
+import { 
+  getContentTypeBadgeVariant, 
+  getLibraryBadgeVariant, 
+  getLibraryName,
+  getBadgeArrangement
+} from "@/lib/utils/badge-utils"
+import { cn } from "@/lib/utils"
 import type { Prompt } from "@/lib/types/content"
 
 interface PromptCardProps {
@@ -11,17 +18,12 @@ interface PromptCardProps {
 }
 
 export function PromptCard({ prompt, className }: PromptCardProps) {
-  // Extract library name from path (e.g., "libraries/promptz/prompts/..." -> "promptz")
-  const getLibraryName = (path: string): string => {
-    const pathParts = path.split('/')
-    const librariesIndex = pathParts.indexOf('libraries')
-    if (librariesIndex !== -1 && librariesIndex + 1 < pathParts.length) {
-      return pathParts[librariesIndex + 1]
-    }
-    return 'unknown'
-  }
-
   const libraryName = getLibraryName(prompt.path)
+  
+  // Get badge configurations
+  const contentTypeBadge = getContentTypeBadgeVariant('prompt')
+  const libraryBadge = getLibraryBadgeVariant(libraryName)
+  const badgeArrangement = getBadgeArrangement('card-header')
   
   // Use git information if available, otherwise fall back to frontmatter
   const displayAuthor = prompt.git?.author || prompt.author
@@ -35,9 +37,25 @@ export function PromptCard({ prompt, className }: PromptCardProps) {
           <CardTitle className="text-lg font-semibold leading-tight">
             {prompt.title}
           </CardTitle>
-          <div className="flex flex-wrap gap-1 shrink-0">
-            <Badge variant="secondary">prompt</Badge>
-            <Badge variant="outline">{libraryName}</Badge>
+          <div className={badgeArrangement.containerClasses}>
+            <Badge 
+              variant={contentTypeBadge.variant}
+              className={cn(
+                badgeArrangement.badgeClasses,
+                contentTypeBadge.className
+              )}
+            >
+              prompt
+            </Badge>
+            <Badge 
+              variant={libraryBadge.variant}
+              className={cn(
+                badgeArrangement.badgeClasses,
+                libraryBadge.className
+              )}
+            >
+              {libraryName}
+            </Badge>
           </div>
         </div>
       </CardHeader>
