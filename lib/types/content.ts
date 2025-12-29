@@ -34,7 +34,7 @@ export interface Agent extends BaseContent {
 export interface AgentConfig {
   mcpServers?: string[]
   tools?: string[]
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface Power extends BaseContent {
@@ -43,7 +43,7 @@ export interface Power extends BaseContent {
   description: string
   keywords: string[]
   content: string
-  mcpConfig?: any
+  mcpConfig?: Record<string, unknown>
   steeringFiles?: string[]
 }
 

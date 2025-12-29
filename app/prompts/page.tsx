@@ -20,22 +20,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Error boundary component for graceful error handling
-function ErrorFallback({ error }: { error: Error }) {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <div className="text-center">
-        <p className="text-lg text-red-600 dark:text-red-400">
-          Unable to load prompts
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Please try again later
-        </p>
-      </div>
-    </div>
-  );
-}
-
 // Loading component for Suspense boundary
 function PromptsLoading() {
   return <PromptsGridSkeleton count={12} />;
@@ -43,13 +27,8 @@ function PromptsLoading() {
 
 // Server component to fetch and display all prompts
 async function AllPrompts() {
-  try {
-    const prompts = await getAllPrompts();
-    return <PromptsGrid prompts={prompts} />;
-  } catch (error) {
-    console.error('Error loading all prompts:', error);
-    return <ErrorFallback error={error as Error} />;
-  }
+  const prompts = await getAllPrompts();
+  return <PromptsGrid prompts={prompts} />;
 }
 
 export default function PromptsPage() {

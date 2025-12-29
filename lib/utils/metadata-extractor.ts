@@ -20,13 +20,13 @@ const PLACEHOLDER_DATE = 'Unknown Date'
  * Get author and date with git fallback
  */
 async function getAuthorAndDate(
-  frontmatterData: Record<string, any>,
+  frontmatterData: Record<string, unknown>,
   filePath: string,
   useDirectory = false
 ): Promise<{ author: string; date: string; git?: GitInfo }> {
-  // Try frontmatter first
-  let author = frontmatterData.author
-  let date = frontmatterData.date
+  // Try frontmatter first - ensure they are strings
+  let author = typeof frontmatterData.author === 'string' ? frontmatterData.author : undefined
+  let date = typeof frontmatterData.date === 'string' ? frontmatterData.date : undefined
   
   // Extract git information
   const gitInfo = useDirectory 
@@ -73,7 +73,10 @@ export async function extractPowerMetadata(
     const { data } = parsed
     
     // Validate required fields
-    if (!data.name || !data.description) {
+    const name = typeof data.name === 'string' ? data.name : undefined
+    const description = typeof data.description === 'string' ? data.description : undefined
+    
+    if (!name || !description) {
       console.warn(`Power missing required metadata: ${powerDir}`)
       return null
     }
@@ -82,20 +85,22 @@ export async function extractPowerMetadata(
     const { author, date, git } = await getAuthorAndDate(data, powerPath, true)
     
     const id = generatePathId(libraryName, 'powers', powerDir)
+    const displayName = typeof data.displayName === 'string' ? data.displayName : name
+    const keywords = Array.isArray(data.keywords) ? data.keywords : []
     
     return {
       type: 'power',
       id,
-      title: data.displayName || data.name || generateTitleFromFilename(powerDir),
+      title: displayName || generateTitleFromFilename(powerDir),
       author,
       date,
       path: powerPath,
       git,
-      displayName: data.displayName || data.name,
-      description: data.description,
-      keywords: Array.isArray(data.keywords) ? data.keywords : [],
+      displayName,
+      description,
+      keywords,
       content: parsed.content,
-      mcpConfig: await parseJsonConfig(path.join(powerPath, 'mcp.json')),
+      mcpConfig: (await parseJsonConfig(path.join(powerPath, 'mcp.json'))) || undefined,
       steeringFiles: [] // TODO: scan steering directory
     }
   } catch (error) {
@@ -130,16 +135,18 @@ export async function extractAgentMetadata(
     const { author, date, git } = await getAuthorAndDate(data, agentPath, true)
     
     const id = generatePathId(libraryName, 'agents', agentDir)
+    const title = typeof data.title === 'string' ? data.title : generateTitleFromFilename(agentDir)
+    const description = typeof data.description === 'string' ? data.description : 'AI Agent'
     
     return {
       type: 'agent',
       id,
-      title: data.title || generateTitleFromFilename(agentDir),
+      title,
       author,
       date,
       path: agentPath,
       git,
-      description: data.description || 'AI Agent',
+      description,
       config: config || {},
       content: parsed.content
     }
@@ -169,17 +176,19 @@ export async function extractPromptMetadata(
     
     const promptName = path.basename(promptFile, '.md')
     const id = generatePathId(libraryName, 'prompts', promptName)
+    const title = typeof data.title === 'string' ? data.title : generateTitleFromFilename(promptName)
+    const category = typeof data.category === 'string' ? data.category : undefined
     
     return {
       type: 'prompt',
       id,
-      title: data.title || generateTitleFromFilename(promptName),
+      title,
       author,
       date,
       path: promptPath,
       git,
       content: parsed.content,
-      category: data.category
+      category
     }
   } catch (error) {
     console.warn(`Failed to extract prompt metadata: ${promptFile}`, error)
@@ -207,17 +216,19 @@ export async function extractSteeringMetadata(
     
     const steeringName = path.basename(steeringFile, '.md')
     const id = generatePathId(libraryName, 'steering', steeringName)
+    const title = typeof data.title === 'string' ? data.title : generateTitleFromFilename(steeringName)
+    const category = typeof data.category === 'string' ? data.category : undefined
     
     return {
       type: 'steering',
       id,
-      title: data.title || generateTitleFromFilename(steeringName),
+      title,
       author,
       date,
       path: steeringPath,
       git,
       content: parsed.content,
-      category: data.category
+      category
     }
   } catch (error) {
     console.warn(`Failed to extract steering metadata: ${steeringFile}`, error)
@@ -245,17 +256,19 @@ export async function extractHookMetadata(
     
     const hookName = path.basename(hookFile, '.kiro.hook')
     const id = generatePathId(libraryName, 'hooks', hookName)
+    const title = typeof data.title === 'string' ? data.title : generateTitleFromFilename(hookName)
+    const trigger = typeof data.trigger === 'string' ? data.trigger : undefined
     
     return {
       type: 'hook',
       id,
-      title: data.title || generateTitleFromFilename(hookName),
+      title,
       author,
       date,
       path: hookPath,
       git,
       content: parsed.content,
-      trigger: data.trigger
+      trigger
     }
   } catch (error) {
     console.warn(`Failed to extract hook metadata: ${hookFile}`, error)

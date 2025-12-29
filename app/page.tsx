@@ -3,22 +3,6 @@ import { Suspense } from "react";
 import { PromptsGrid, PromptsGridSkeleton } from "@/components/prompts-grid";
 import { getLatestPrompts } from "@/lib/prompts";
 
-// Error boundary component for graceful error handling
-function ErrorFallback({ error }: { error: Error }) {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <div className="text-center">
-        <p className="text-lg text-red-600 dark:text-red-400">
-          Unable to load prompts
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Please try again later
-        </p>
-      </div>
-    </div>
-  );
-}
-
 // Loading component for Suspense boundary
 function PromptsLoading() {
   return <PromptsGridSkeleton count={6} />;
@@ -26,13 +10,8 @@ function PromptsLoading() {
 
 // Server component to fetch and display prompts
 async function LatestPrompts() {
-  try {
-    const prompts = await getLatestPrompts(6);
-    return <PromptsGrid prompts={prompts} maxItems={6} />;
-  } catch (error) {
-    console.error('Error loading prompts:', error);
-    return <ErrorFallback error={error as Error} />;
-  }
+  const prompts = await getLatestPrompts(6);
+  return <PromptsGrid prompts={prompts} maxItems={6} />;
 }
 
 export default function Home() {

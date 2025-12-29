@@ -1,10 +1,9 @@
 import fs from 'fs'
-import path from 'path'
 import matter from 'gray-matter'
 
 export interface ParsedFile {
   content: string
-  data: Record<string, any>
+  data: Record<string, unknown>
 }
 
 /**
@@ -41,7 +40,7 @@ export function parseYamlFrontmatter(content: string): ParsedFile {
 /**
  * Parse JSON configuration file
  */
-export async function parseJsonConfig(filePath: string): Promise<Record<string, any> | null> {
+export async function parseJsonConfig(filePath: string): Promise<Record<string, unknown> | null> {
   try {
     const content = await safeFileRead(filePath)
     if (!content) return null

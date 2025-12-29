@@ -183,7 +183,7 @@ describe('Badge Utils', () => {
     })
 
     it('should return default priority for unknown badge types', () => {
-      const result = getBadgePriority('unknown' as any)
+      const result = getBadgePriority('unknown' as 'content-type' | 'library' | 'category' | 'status')
       expect(result).toBe(0)
     })
   })
