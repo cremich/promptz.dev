@@ -1,3 +1,31 @@
+# Product Overview
+
+Promptz is the ultimate library for Kiro, Kiro CLI, and Amazon Q Developer, designed to help developers create, contribute and perfect their prompts, steering files, agent hooks, kiro powers, and custom agents for every step of the software development lifecycle.
+
+## Core Purpose
+
+promptz.dev is website that serves as a comprehensive and community-driven library for AI-assisted development, providing core content types:
+
+- **Prompts** - AI instructions for specific development tasks (code generation, testing, documentation, architecture, etc.)
+- **Steering Docments** - Steering files ensure Kiro and Amazon Q Developer consistently follows established patterns, libraries, and standards.
+- **Custom Agents** - Specialized AI assistants for specific workflows and development processes
+- **Agent Hooks** - Agent hooks are powerful automation tools that streamline your development workflow by automatically executing predefined agent actions when specific events occur in your IDE.
+- **Kiro Powers** - Powers package tools, workflows, and best practices into a format that Kiro can activate on-demand.
+
+## Key Features
+
+- Git-based content management through libraries added as git submodules
+- rendering of prompts, steering docs, custom agent configurations, agent hooks and kiro powers
+- Efficient Content discovery across multiple libraries
+- Community-driven collaboration
+
+## Target Audience
+
+- Developers using Kiro, Kiro CLI and Amazon Q Developer
+- Development teams establishing coding standards
+- Contributors creating and sharing AI prompts and development workflows
+- Organizations implementing AI-assisted development practices
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

@@ -1,0 +1,6 @@
+[submodule "libraries/kiro-powers"]
+	path = libraries/kiro-powers
+	url = git@github.com:kirodotdev/powers.git
+[submodule "libraries/promptz"]
+	path = libraries/promptz
+	url = git@github.com:cremich/promptz.lib.git
