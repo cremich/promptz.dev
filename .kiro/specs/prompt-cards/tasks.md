@@ -6,7 +6,7 @@ This implementation plan breaks down the prompt card rendering feature into disc
 
 ## Tasks
 
-- [ ] 1. Create PromptCard component with shadcn integration
+- [x] 1. Create PromptCard component with shadcn integration
   - Create `components/prompt-card.tsx` using shadcn Card and Badge components
   - Implement proper TypeScript interfaces using existing types from `lib/types/content.ts`
   - Display prompt title, ID, type badge, and library source badge
