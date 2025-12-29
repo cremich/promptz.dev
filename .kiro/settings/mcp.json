@@ -25,6 +25,9 @@
       "args": [
         "-y",
         "next-devtools-mcp@latest"
+      ],
+      "autoApprove": [
+        "nextjs_docs"
       ]
     }
   }

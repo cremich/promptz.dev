@@ -5,12 +5,49 @@
 ```
 promptz.dev/
 ├── app/                    # Next.js App Router pages and layouts
+├── lib/                    # Content service and utilities
+│   ├── types/              # TypeScript type definitions
+│   ├── utils/              # Utility functions and parsers
+│   └── content-service.ts  # Main content service with caching
 ├── libraries/              # Git submodules for content libraries
 ├── public/                 # Static assets (images, icons, fonts)
 ├── .kiro/                  # Kiro configuration and steering files
 ├── .next/                  # Next.js build output (generated)
 ├── node_modules/           # Dependencies (generated)
 └── configuration files     # Package.json, configs, etc.
+```
+
+## Content Service Architecture
+
+### lib/ Directory Structure
+- **lib/types/content.ts**: TypeScript interfaces for all content types with union types
+- **lib/utils/file-parser.ts**: File system utilities and parsing functions
+- **lib/utils/metadata-extractor.ts**: Content-specific metadata extraction logic
+- **lib/utils/git-extractor.ts**: Git history analysis and information extraction
+- **lib/content-service.ts**: Main service with React cache integration
+
+### Content Service Features
+- **Type-safe content processing**: Union types enable cross-content operations
+- **Intelligent metadata extraction**: Multi-source fallback strategy (frontmatter → git → placeholders)
+- **Git integration**: Real author attribution, commit history, and content lifecycle tracking
+- **Performance optimization**: React cache for request-level memoization
+- **Error resilience**: Graceful handling of missing files and corrupted data
+- **Content validation**: Filtering of incomplete or invalid content
+
+### Content Type System
+```typescript
+// Union type for type-safe operations across all content
+type ContentItem = Prompt | Agent | Power | SteeringDocument | Hook
+
+// Base interface with git integration
+interface BaseContent {
+  id: string           // Path-based ID generation
+  title: string        // From frontmatter or filename
+  author: string       // From frontmatter or git history
+  date: string         // From frontmatter or git commits
+  path: string         // File system path
+  git?: GitInfo        // Optional git metadata
+}
 ```
 
 ## App Directory Structure
@@ -114,15 +151,24 @@ prompts/
 ## Development Workflow Structure
 
 ### Local Development
-1. **Root level**: Main application development
+1. **Root level**: Main application development with content service integration
 2. **Libraries**: Navigate to submodules for content editing
 3. **Submodule workflow**: Independent git repositories with their own commit history
+4. **Content service testing**: Use `/test-content` route for validation and debugging
+
+### Content Service Development
+1. **Type definitions**: Start with `lib/types/content.ts` for new content types
+2. **Metadata extraction**: Add extractors in `lib/utils/metadata-extractor.ts`
+3. **Service integration**: Update `lib/content-service.ts` for new content sources
+4. **Testing**: Validate with test components and git integration showcase
 
 ### Content Contribution
 1. **Fork library**: Create fork of specific library repository
-2. **Create content**: Add new prompts, powers, or agents
-3. **Submit PR**: Contribute back to main library repository
-4. **Update reference**: Parent repository updates submodule reference
+2. **Create content**: Add new prompts, powers, or agents with proper frontmatter
+3. **Git workflow**: Commit with descriptive messages for proper attribution
+4. **Submit PR**: Contribute back to main library repository
+5. **Update reference**: Parent repository updates submodule reference
+6. **Validation**: Content service automatically extracts git metadata and validates structure
 
 ## Deployment Structure
 
@@ -130,3 +176,19 @@ prompts/
 - **API routes**: Server-side functionality (if added to app/api/)
 - **Generated pages**: Static and server-rendered pages from app/ directory
 - **Submodule content**: Included in build process for content rendering
+- **Content service**: Server-side rendering with React cache optimization
+- **Git integration**: Repository analysis during build time for metadata extraction
+
+## Testing and Validation
+
+### Content Service Testing
+- **Test route**: `/test-content` provides comprehensive content service validation
+- **Git showcase**: Demonstrates git integration features and analytics
+- **Union type examples**: Shows type-safe content processing patterns
+- **Error handling**: Validates graceful degradation with missing content
+
+### Content Validation
+- **Metadata completeness**: Checks for required fields and fallback strategies
+- **Git integration**: Validates author attribution and commit history extraction
+- **Type safety**: Ensures all content types conform to TypeScript interfaces
+- **Performance**: Monitors caching effectiveness and response times
