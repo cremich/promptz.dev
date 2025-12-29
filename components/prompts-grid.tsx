@@ -1,4 +1,4 @@
-import { PromptCard } from "@/components/prompt-card"
+import { PromptCard, PromptCardSkeleton } from "@/components/prompt-card"
 import type { Prompt } from "@/lib/types/content"
 
 interface PromptsGridProps {
@@ -33,6 +33,21 @@ export function PromptsGrid({ prompts, maxItems, className = "" }: PromptsGridPr
         <PromptCard 
           key={prompt.id} 
           prompt={prompt}
+          className="h-full"
+        />
+      ))}
+    </div>
+  )
+}
+
+export function PromptsGridSkeleton({ count = 6, className = "" }: { count?: number; className?: string }) {
+  return (
+    <div 
+      className={`grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr ${className}`}
+    >
+      {Array.from({ length: count }, (_, i) => (
+        <PromptCardSkeleton 
+          key={i}
           className="h-full"
         />
       ))}

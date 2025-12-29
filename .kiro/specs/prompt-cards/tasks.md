@@ -55,7 +55,7 @@ This implementation plan breaks down the prompt card rendering feature into disc
   - **Property 12: Error Handling Resilience**
   - **Validates: Requirements 5.4**
 
-- [ ] 4. Update homepage to display latest 6 prompts
+- [x] 4. Update homepage to display latest 6 prompts
   - Modify `app/page.tsx` to fetch and display prompts using Server Components
   - Integrate PromptsGrid component with 6-prompt limit
   - Maintain existing homepage layout and styling

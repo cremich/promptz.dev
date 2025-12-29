@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { PromptCard } from '@/components/prompt-card'
+import { PromptCard, PromptCardSkeleton } from '@/components/prompt-card'
 import type { Prompt } from '@/lib/types/content'
 
 // Mock the git utility functions
@@ -110,5 +110,32 @@ describe('PromptCard', () => {
     render(<PromptCard prompt={unknownPrompt} />)
     
     expect(screen.getByText('unknown')).toBeInTheDocument()
+  })
+})
+
+describe('PromptCardSkeleton', () => {
+  it('should render skeleton elements with proper structure', () => {
+    render(<PromptCardSkeleton />)
+    
+    // Check that skeleton elements are present
+    const skeletons = screen.getAllByTestId('skeleton')
+    expect(skeletons.length).toBeGreaterThan(0)
+  })
+
+  it('should apply custom className when provided', () => {
+    const { container } = render(<PromptCardSkeleton className="custom-class" />)
+    
+    const card = container.querySelector('[data-slot="card"]')
+    expect(card).toHaveClass('custom-class')
+  })
+
+  it('should have the same card structure as PromptCard', () => {
+    const { container } = render(<PromptCardSkeleton />)
+    
+    // Check for card structure elements
+    expect(container.querySelector('[data-slot="card"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="card-header"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="card-content"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="card-footer"]')).toBeInTheDocument()
   })
 })

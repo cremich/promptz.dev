@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { PromptsGrid } from '@/components/prompts-grid'
+import { PromptsGrid, PromptsGridSkeleton } from '@/components/prompts-grid'
 import type { Prompt } from '@/lib/types/content'
 
 // Mock the PromptCard component
@@ -7,6 +7,11 @@ jest.mock('@/components/prompt-card', () => ({
   PromptCard: ({ prompt }: { prompt: Prompt }) => (
     <div data-testid={`prompt-card-${prompt.id}`}>
       {prompt.title}
+    </div>
+  ),
+  PromptCardSkeleton: ({ className }: { className?: string }) => (
+    <div data-testid="prompt-card-skeleton" className={className}>
+      Skeleton
     </div>
   )
 }))
@@ -90,5 +95,51 @@ describe('PromptsGrid', () => {
     render(<PromptsGrid prompts={[]} maxItems={5} />)
     
     expect(screen.getByText('No prompts available')).toBeInTheDocument()
+  })
+})
+
+describe('PromptsGridSkeleton', () => {
+  it('should render default number of skeleton cards (6)', () => {
+    render(<PromptsGridSkeleton />)
+    
+    const skeletons = screen.getAllByTestId('prompt-card-skeleton')
+    expect(skeletons).toHaveLength(6)
+  })
+
+  it('should render custom number of skeleton cards when count is specified', () => {
+    render(<PromptsGridSkeleton count={3} />)
+    
+    const skeletons = screen.getAllByTestId('prompt-card-skeleton')
+    expect(skeletons).toHaveLength(3)
+  })
+
+  it('should apply responsive grid classes', () => {
+    const { container } = render(<PromptsGridSkeleton />)
+    
+    const gridElement = container.querySelector('.grid')
+    expect(gridElement).toHaveClass('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3')
+  })
+
+  it('should apply equal height grid rows', () => {
+    const { container } = render(<PromptsGridSkeleton />)
+    
+    const gridElement = container.querySelector('.grid')
+    expect(gridElement).toHaveClass('auto-rows-fr')
+  })
+
+  it('should apply custom className when provided', () => {
+    const { container } = render(<PromptsGridSkeleton className="custom-class" />)
+    
+    const gridElement = container.querySelector('.grid')
+    expect(gridElement).toHaveClass('custom-class')
+  })
+
+  it('should apply h-full class to skeleton cards', () => {
+    render(<PromptsGridSkeleton />)
+    
+    const skeletons = screen.getAllByTestId('prompt-card-skeleton')
+    skeletons.forEach(skeleton => {
+      expect(skeleton).toHaveClass('h-full')
+    })
   })
 })
