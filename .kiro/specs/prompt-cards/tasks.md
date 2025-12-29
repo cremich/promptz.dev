@@ -40,7 +40,7 @@ This implementation plan breaks down the prompt card rendering feature into disc
   - **Property 5: Empty State Handling**
   - **Validates: Requirements 1.4, 2.4**
 
-- [ ] 3. Implement data fetching utilities
+- [x] 3. Implement data fetching utilities
   - Create `lib/prompts.ts` with functions to fetch and sort prompts
   - Implement `getLatestPrompts(limit?: number)` for homepage
   - Implement `getAllPrompts()` for prompts page
