@@ -1,17 +1,30 @@
 import Image from "next/image";
 import { Suspense } from "react";
 import { PromptsGrid, PromptsGridSkeleton } from "@/components/prompts-grid";
+import { SteeringGrid, SteeringGridSkeleton } from "@/components/steering-grid";
 import { getLatestPrompts } from "@/lib/prompts";
+import { getLatestSteering } from "@/lib/steering";
 
 // Loading component for Suspense boundary
 function PromptsLoading() {
   return <PromptsGridSkeleton count={6} />;
 }
 
+// Loading component for Steering Suspense boundary
+function SteeringLoading() {
+  return <SteeringGridSkeleton count={6} />;
+}
+
 // Server component to fetch and display prompts
 async function LatestPrompts() {
   const prompts = await getLatestPrompts(6);
   return <PromptsGrid prompts={prompts} maxItems={6} />;
+}
+
+// Server component to fetch and display steering documents
+async function LatestSteering() {
+  const steering = await getLatestSteering(6);
+  return <SteeringGrid steering={steering} maxItems={6} />;
 }
 
 export default function Home() {
@@ -69,6 +82,25 @@ export default function Home() {
           
           <Suspense fallback={<PromptsLoading />}>
             <LatestPrompts />
+          </Suspense>
+        </section>
+
+        {/* Latest Steering Documents Section */}
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
+              Latest Steering Documents
+            </h2>
+            <a
+              href="/steering"
+              className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-50 transition-colors"
+            >
+              View all →
+            </a>
+          </div>
+          
+          <Suspense fallback={<SteeringLoading />}>
+            <LatestSteering />
           </Suspense>
         </section>
       </main>

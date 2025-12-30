@@ -6,7 +6,7 @@ This implementation plan creates the steering documents rendering feature by fol
 
 ## Tasks
 
-- [ ] 1. Create steering service following prompts service pattern
+- [x] 1. Create steering service following prompts service pattern
   - Create `lib/steering.ts` with getAllSteering and getLatestSteering functions
   - Implement React cache for request-level memoization
   - Add error handling with empty array fallbacks
@@ -25,11 +25,11 @@ This implementation plan creates the steering documents rendering feature by fol
   - **Property 3: Library aggregation completeness**
   - **Validates: Requirements 2.1, 7.2**
 
-- [ ]* 1.4 Write unit tests for steering service error handling
+- [x]* 1.4 Write unit tests for steering service error handling
   - Test empty data scenarios and error conditions
   - _Requirements: 6.4, 7.5_
 
-- [ ] 2. Implement SteeringCard component
+- [x] 2. Implement SteeringCard component
   - Create `components/steering-card.tsx` following PromptCard structure
   - Use shadcn Card component as base with header, content, and footer sections
   - Display title, ID, author, date, and git commit hash
@@ -52,7 +52,7 @@ This implementation plan creates the steering documents rendering feature by fol
   - **Property 7: SteeringCard date display**
   - **Validates: Requirements 3.5**
 
-- [ ] 3. Implement badge functionality for SteeringCard
+- [x] 3. Implement badge functionality for SteeringCard
   - Add content type badge showing "steering" with outline variant
   - Add library source badge using existing badge utilities
   - Follow card-header badge arrangement pattern
@@ -71,25 +71,25 @@ This implementation plan creates the steering documents rendering feature by fol
   - **Property 10: Badge utility consistency**
   - **Validates: Requirements 4.3, 4.4**
 
-- [ ] 4. Create SteeringGrid component
+- [x] 4. Create SteeringGrid component
   - Create `components/steering-grid.tsx` following PromptsGrid pattern
   - Implement responsive CSS Grid layout with auto-fit columns
   - Add maxItems prop for limiting displayed items
   - Create SteeringGridSkeleton for loading states
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ]* 4.1 Write unit tests for SteeringGrid responsive behavior
+- [x]* 4.1 Write unit tests for SteeringGrid responsive behavior
   - Test grid layout structure and responsive breakpoints
   - _Requirements: 5.1, 5.3, 5.4_
 
-- [ ]* 4.2 Write unit tests for SteeringGrid skeleton matching
+- [x]* 4.2 Write unit tests for SteeringGrid skeleton matching
   - Test skeleton structure matches actual component layout
   - _Requirements: 5.5_
 
-- [ ] 5. Checkpoint - Ensure all component tests pass
+- [x] 5. Checkpoint - Ensure all component tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Add steering section to homepage
+- [x] 6. Add steering section to homepage
   - Update `app/page.tsx` to include "Latest Steering Documents" section
   - Add server component to fetch latest 6 steering documents
   - Implement Suspense boundary with loading fallback
@@ -101,7 +101,7 @@ This implementation plan creates the steering documents rendering feature by fol
   - Test empty state handling
   - _Requirements: 1.1, 1.4, 1.5_
 
-- [ ] 7. Create dedicated steering page
+- [x] 7. Create dedicated steering page
   - Create `app/steering/page.tsx` following prompts page pattern
   - Add proper SEO metadata and page title
   - Implement server component to fetch all steering documents
