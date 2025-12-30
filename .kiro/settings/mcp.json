@@ -27,7 +27,8 @@
         "next-devtools-mcp@latest"
       ],
       "autoApprove": [
-        "nextjs_docs"
+        "nextjs_docs",
+        "init"
       ]
     }
   }
