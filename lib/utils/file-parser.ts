@@ -1,5 +1,6 @@
 import fs from 'fs'
 import matter from 'gray-matter'
+import { cacheLife, cacheTag } from 'next/cache'
 
 export interface ParsedFile {
   content: string
@@ -10,6 +11,10 @@ export interface ParsedFile {
  * Safely read a file and return null if it fails
  */
 export async function safeFileRead(filePath: string): Promise<string | null> {
+  'use cache'
+  cacheLife('days') // File content rarely changes, cache for 1 day
+  cacheTag('file-content', `file-${filePath}`)
+  
   try {
     return await fs.promises.readFile(filePath, 'utf-8')
   } catch (error) {
@@ -41,6 +46,10 @@ export function parseYamlFrontmatter(content: string): ParsedFile {
  * Parse JSON configuration file
  */
 export async function parseJsonConfig(filePath: string): Promise<Record<string, unknown> | null> {
+  'use cache'
+  cacheLife('days') // Config files rarely change, cache for 1 day
+  cacheTag('json-config', `json-${filePath}`)
+  
   try {
     const content = await safeFileRead(filePath)
     if (!content) return null

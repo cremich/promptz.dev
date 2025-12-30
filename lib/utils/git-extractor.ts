@@ -1,4 +1,5 @@
 import { simpleGit, SimpleGit, LogResult } from 'simple-git'
+import { cacheLife, cacheTag } from 'next/cache'
 import path from 'path'
 
 export interface GitFileInfo {
@@ -29,6 +30,10 @@ function getGitInstance(repoPath: string): SimpleGit {
  * Extract git information for a specific file
  */
 export async function extractGitFileInfo(filePath: string): Promise<GitFileInfo | null> {
+  'use cache'
+  cacheLife('days') // Git history rarely changes, cache for 1 day
+  cacheTag('git-file-info', `git-${filePath}`)
+  
   try {
     // Find the git repository root for this file
     const repoPath = await findGitRoot(filePath)
@@ -104,6 +109,10 @@ async function findGitRoot(filePath: string): Promise<string | null> {
  * Extract git information for a directory (useful for powers/agents)
  */
 export async function extractGitDirectoryInfo(dirPath: string): Promise<GitFileInfo | null> {
+  'use cache'
+  cacheLife('days') // Git history rarely changes, cache for 1 day
+  cacheTag('git-dir-info', `git-dir-${dirPath}`)
+  
   try {
     const repoPath = await findGitRoot(dirPath)
     if (!repoPath) {

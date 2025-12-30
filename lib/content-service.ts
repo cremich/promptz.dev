@@ -1,5 +1,6 @@
 import 'server-only'
 import { cache } from 'react'
+import { cacheLife, cacheTag } from 'next/cache'
 import path from 'path'
 import { 
   directoryExists, 
@@ -21,6 +22,10 @@ const LIBRARIES_PATH = path.join(process.cwd(), 'libraries')
  * Read and parse the Promptz community library
  */
 export const readPromptzLibrary = cache(async (): Promise<Library> => {
+  'use cache'
+  cacheLife('days') // Cache for 1 day since content updates 3-5 times per week
+  cacheTag('promptz-library')
+  
   const libraryPath = path.join(LIBRARIES_PATH, 'promptz')
   const libraryName = 'promptz'
   
@@ -52,6 +57,10 @@ export const readPromptzLibrary = cache(async (): Promise<Library> => {
  * Read and parse the Kiro Powers library
  */
 export const readKiroLibrary = cache(async (): Promise<Library> => {
+  'use cache'
+  cacheLife('days') // Cache for 1 day since content updates 3-5 times per week
+  cacheTag('kiro-library')
+  
   const libraryPath = path.join(LIBRARIES_PATH, 'kiro-powers')
   const libraryName = 'kiro-powers'
   
@@ -78,6 +87,10 @@ export const readKiroLibrary = cache(async (): Promise<Library> => {
  * Read powers from a directory
  */
 async function readPowers(libraryName: string, powersPath: string): Promise<Power[]> {
+  'use cache'
+  cacheLife('days')
+  cacheTag('powers', `powers-${libraryName}`)
+  
   if (!(await directoryExists(powersPath))) {
     return []
   }
@@ -101,6 +114,10 @@ async function readPowers(libraryName: string, powersPath: string): Promise<Powe
  * Read agents from a directory
  */
 async function readAgents(libraryName: string, agentsPath: string): Promise<Agent[]> {
+  'use cache'
+  cacheLife('days')
+  cacheTag('agents', `agents-${libraryName}`)
+  
   if (!(await directoryExists(agentsPath))) {
     return []
   }
@@ -124,6 +141,10 @@ async function readAgents(libraryName: string, agentsPath: string): Promise<Agen
  * Read prompts from a directory
  */
 async function readPrompts(libraryName: string, promptsPath: string): Promise<Prompt[]> {
+  'use cache'
+  cacheLife('days')
+  cacheTag('prompts', `prompts-${libraryName}`)
+  
   if (!(await directoryExists(promptsPath))) {
     return []
   }
@@ -147,6 +168,10 @@ async function readPrompts(libraryName: string, promptsPath: string): Promise<Pr
  * Read steering documents from a directory
  */
 async function readSteering(libraryName: string, steeringPath: string): Promise<SteeringDocument[]> {
+  'use cache'
+  cacheLife('days')
+  cacheTag('steering', `steering-${libraryName}`)
+  
   if (!(await directoryExists(steeringPath))) {
     return []
   }
@@ -170,6 +195,10 @@ async function readSteering(libraryName: string, steeringPath: string): Promise<
  * Read hooks from a directory
  */
 async function readHooks(libraryName: string, hooksPath: string): Promise<Hook[]> {
+  'use cache'
+  cacheLife('days')
+  cacheTag('hooks', `hooks-${libraryName}`)
+  
   if (!(await directoryExists(hooksPath))) {
     return []
   }
