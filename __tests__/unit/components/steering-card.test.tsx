@@ -33,7 +33,7 @@ jest.mock('@/lib/utils/badge-utils', () => ({
 
 describe('SteeringCard', () => {
   const mockSteering: SteeringDocument = {
-    id: 'test-steering',
+    id: 'promptz/steering/test-steering',
     title: 'Test Steering Document',
     author: 'Test Author',
     date: '2024-01-15',
@@ -62,7 +62,7 @@ describe('SteeringCard', () => {
     render(<SteeringCard steering={mockSteering} />)
     
     expect(screen.getByText('ID:')).toBeInTheDocument()
-    expect(screen.getByText('test-steering')).toBeInTheDocument()
+    expect(screen.getByText('promptz/steering/test-steering')).toBeInTheDocument()
   })
 
   it('should show steering type badge with outline variant', () => {
@@ -116,6 +116,7 @@ describe('SteeringCard', () => {
   it('should extract library name from different paths', () => {
     const kiroSteering: SteeringDocument = {
       ...mockSteering,
+      id: 'kiro-powers/steering/test',
       path: 'libraries/kiro-powers/steering/test.md'
     }
     
@@ -127,6 +128,7 @@ describe('SteeringCard', () => {
   it('should handle unknown library paths', () => {
     const unknownSteering: SteeringDocument = {
       ...mockSteering,
+      id: 'unknown/steering/test',
       path: 'some/other/path/test.md'
     }
     
@@ -147,7 +149,7 @@ describe('SteeringCard', () => {
     
     // Check that all required fields are present
     expect(screen.getByText('Test Steering Document')).toBeInTheDocument() // title
-    expect(screen.getByText('test-steering')).toBeInTheDocument() // ID
+    expect(screen.getByText('promptz/steering/test-steering')).toBeInTheDocument() // ID
     expect(screen.getByText('Git Author')).toBeInTheDocument() // author
     expect(screen.getByText('Jan 15, 2024')).toBeInTheDocument() // date
     expect(screen.getByText('abc1234')).toBeInTheDocument() // commit hash
@@ -210,7 +212,7 @@ describe('SteeringCardSkeleton', () => {
   it('should match the visual structure of the actual SteeringCard', () => {
     const { container: skeletonContainer } = render(<SteeringCardSkeleton />)
     const { container: cardContainer } = render(<SteeringCard steering={{
-      id: 'test',
+      id: 'promptz/steering/test',
       title: 'Test',
       author: 'Author',
       date: '2024-01-15',

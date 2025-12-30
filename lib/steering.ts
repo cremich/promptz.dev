@@ -70,3 +70,24 @@ export const getLatestSteering = cache(async (limit?: number): Promise<SteeringD
     return []
   }
 })
+
+/**
+ * Get a specific steering document by ID
+ * Used for detail pages to display individual steering documents
+ * Returns null if steering document is not found
+ */
+export const getSteeringById = cache(async (id: string): Promise<SteeringDocument | null> => {
+  try {
+    const allSteering = await getAllSteering()
+    
+    // Find steering document with matching ID
+    const steering = allSteering.find(s => s.id === id)
+    
+    return steering || null
+    
+  } catch (error) {
+    console.error(`Error fetching steering document with ID ${id}:`, error)
+    // Return null on error to trigger 404 page
+    return null
+  }
+})
