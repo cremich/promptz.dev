@@ -1,8 +1,10 @@
+import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getShortHash } from "@/lib/utils/git-extractor"
 import { getFormattedDisplayDate } from "@/lib/utils/date-formatter"
+import { idToSlug } from "@/lib/utils/slug-utils"
 import { 
   getContentTypeBadgeVariant, 
   getLibraryBadgeVariant, 
@@ -30,63 +32,65 @@ export function HookCard({ hook, className }: HookCardProps) {
   const formattedDate = getFormattedDisplayDate(hook.git?.createdDate, hook.date)
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg font-semibold leading-tight">
-            {hook.title}
-          </CardTitle>
-          <div className={badgeArrangement.containerClasses}>
-            <Badge 
-              variant={contentTypeBadge.variant}
-              className={cn(
-                badgeArrangement.badgeClasses,
-                contentTypeBadge.className
-              )}
-            >
-              hook
-            </Badge>
-            <Badge 
-              variant={libraryBadge.variant}
-              className={cn(
-                badgeArrangement.badgeClasses,
-                libraryBadge.className
-              )}
-            >
-              {libraryName}
-            </Badge>
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent>
-        <div className="space-y-2">
-          <div className="text-sm text-muted-foreground">
-            <span className="font-medium">ID:</span> {hook.id}
-          </div>
-          <div className="text-sm text-muted-foreground">
-            <span className="font-medium">Description:</span> {hook.description}
-          </div>
-          {hook.trigger && (
-            <div className="text-sm text-muted-foreground">
-              <span className="font-medium">Trigger:</span> {hook.trigger}
+    <Link href={`/hooks/${idToSlug(hook.id)}`} className="block">
+      <Card className={cn("transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50", className)}>
+        <CardHeader>
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="text-lg font-semibold leading-tight">
+              {hook.title}
+            </CardTitle>
+            <div className={badgeArrangement.containerClasses}>
+              <Badge 
+                variant={contentTypeBadge.variant}
+                className={cn(
+                  badgeArrangement.badgeClasses,
+                  contentTypeBadge.className
+                )}
+              >
+                hook
+              </Badge>
+              <Badge 
+                variant={libraryBadge.variant}
+                className={cn(
+                  badgeArrangement.badgeClasses,
+                  libraryBadge.className
+                )}
+              >
+                {libraryName}
+              </Badge>
             </div>
-          )}
-          <div className="text-sm text-muted-foreground">
-            <span className="font-medium">Author:</span> {displayAuthor}
           </div>
-        </div>
-      </CardContent>
+        </CardHeader>
+        
+        <CardContent>
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium">ID:</span> {hook.id}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium">Description:</span> {hook.description}
+            </div>
+            {hook.trigger && (
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium">Trigger:</span> {hook.trigger}
+              </div>
+            )}
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium">Author:</span> {displayAuthor}
+            </div>
+          </div>
+        </CardContent>
 
-      <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>{formattedDate}</span>
-        {hook.git?.commitHash && (
-          <span className="font-mono">
-            {getShortHash(hook.git.commitHash)}
-          </span>
-        )}
-      </CardFooter>
-    </Card>
+        <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{formattedDate}</span>
+          {hook.git?.commitHash && (
+            <span className="font-mono">
+              {getShortHash(hook.git.commitHash)}
+            </span>
+          )}
+        </CardFooter>
+      </Card>
+    </Link>
   )
 }
 

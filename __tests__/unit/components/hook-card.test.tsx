@@ -91,7 +91,9 @@ describe('HookCard', () => {
   it('should apply custom className', () => {
     const { container } = render(<HookCard hook={mockHook} className="custom-class" />)
     
-    expect(container.firstChild).toHaveClass('custom-class')
+    // The className is applied to the Card element, not the Link wrapper
+    const card = container.querySelector('[data-slot="card"]')
+    expect(card).toHaveClass('custom-class')
   })
 
   it('should display ID field', () => {

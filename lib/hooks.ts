@@ -58,3 +58,24 @@ export const getLatestHooks = cache(async (limit?: number): Promise<Hook[]> => {
     return []
   }
 })
+
+/**
+ * Get a specific hook by its ID
+ * Used for hook detail pages
+ * Returns null if hook not found
+ */
+export const getHookById = cache(async (id: string): Promise<Hook | null> => {
+  try {
+    const allHooks = await getAllHooks()
+    
+    // Find hook with matching ID
+    const hook = allHooks.find(h => h.id === id)
+    
+    return hook || null
+    
+  } catch (error) {
+    console.error('Error fetching hook by ID:', error)
+    // Return null on error to trigger 404 page
+    return null
+  }
+})
