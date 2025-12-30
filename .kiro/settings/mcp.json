@@ -40,7 +40,8 @@
       "autoApprove": [
         "list_items_in_registries",
         "search_items_in_registries",
-        "get_add_command_for_items"
+        "get_add_command_for_items",
+        "get_project_registries"
       ]
     }
   }
