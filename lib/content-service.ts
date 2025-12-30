@@ -105,12 +105,12 @@ async function readAgents(libraryName: string, agentsPath: string): Promise<Agen
     return []
   }
   
-  const agentDirs = await getDirectories(agentsPath)
+  const agentFiles = await getFilesWithExtension(agentsPath, '.md')
   const agents: Agent[] = []
   
-  for (const agentDir of agentDirs) {
-    const agentPath = path.join(agentsPath, agentDir)
-    const agent = await extractAgentMetadata(libraryName, agentDir, agentPath)
+  for (const agentFile of agentFiles) {
+    const agentPath = path.join(agentsPath, agentFile)
+    const agent = await extractAgentMetadata(libraryName, agentFile, agentPath)
     
     if (agent) {
       agents.push(agent)

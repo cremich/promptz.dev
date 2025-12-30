@@ -110,19 +110,21 @@ export async function extractPowerMetadata(
 }
 
 /**
- * Extract metadata from an Agent directory (agent.md + config.json)
+ * Extract metadata from an Agent file pair (.md + .json)
  */
 export async function extractAgentMetadata(
   libraryName: string,
-  agentDir: string,
+  agentFile: string,
   agentPath: string
 ): Promise<Agent | null> {
   try {
-    const agentMdPath = path.join(agentPath, 'agent.md')
-    const configPath = path.join(agentPath, 'config.json')
+    // Agent files are structured as: agent-name.md and agent-name.json
+    const baseName = path.basename(agentFile, '.md')
+    const agentDir = path.dirname(agentPath)
+    const configPath = path.join(agentDir, `${baseName}.json`)
     
     const [content, config] = await Promise.all([
-      safeFileRead(agentMdPath),
+      safeFileRead(agentPath),
       parseJsonConfig(configPath)
     ])
     
@@ -131,12 +133,18 @@ export async function extractAgentMetadata(
     const parsed = parseYamlFrontmatter(content)
     const { data } = parsed
     
-    // Get author and date with git fallback (use directory for agents)
-    const { author, date, git } = await getAuthorAndDate(data, agentPath, true)
+    // Get author and date with git fallback (use file for agents)
+    const { author, date, git } = await getAuthorAndDate(data, agentPath, false)
     
-    const id = generatePathId(libraryName, 'agents', agentDir)
-    const title = typeof data.title === 'string' ? data.title : generateTitleFromFilename(agentDir)
-    const description = typeof data.description === 'string' ? data.description : 'AI Agent'
+    const id = generatePathId(libraryName, 'agents', baseName)
+    const title = typeof data.title === 'string' ? data.title : generateTitleFromFilename(baseName)
+    
+    // Get description from config.json if not in frontmatter
+    let description = typeof data.description === 'string' ? data.description : undefined
+    if (!description && config && typeof config.description === 'string') {
+      description = config.description
+    }
+    description = description || 'AI Agent'
     
     return {
       type: 'agent',
@@ -151,7 +159,7 @@ export async function extractAgentMetadata(
       content: parsed.content
     }
   } catch (error) {
-    console.warn(`Failed to extract agent metadata: ${agentDir}`, error)
+    console.warn(`Failed to extract agent metadata: ${agentFile}`, error)
     return null
   }
 }
