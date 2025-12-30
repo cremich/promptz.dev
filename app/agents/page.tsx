@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
-import { AgentsGrid, AgentsGridSkeleton } from "@/components/agents-grid";
+import { Grid, GridSkeleton } from "@/components/grid";
 import { getAllAgents } from "@/lib/agents";
 
 // SEO metadata for the agents page
@@ -22,13 +22,13 @@ export const metadata: Metadata = {
 
 // Loading component for Suspense boundary
 function AgentsLoading() {
-  return <AgentsGridSkeleton count={12} />;
+  return <GridSkeleton count={12} />;
 }
 
 // Server component to fetch and display all agents
 async function AllAgents() {
   const agents = await getAllAgents();
-  return <AgentsGrid agents={agents} />;
+  return <Grid items={agents} />;
 }
 
 export default function AgentsPage() {

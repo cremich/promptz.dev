@@ -1,17 +1,17 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { PowersGrid, PowersGridSkeleton } from "@/components/powers-grid";
+import { Grid, GridSkeleton } from "@/components/grid";
 import { getAllPowers } from "@/lib/powers";
 
 // Loading component for Suspense boundary
 function PowersLoading() {
-  return <PowersGridSkeleton count={12} />;
+  return <GridSkeleton count={12} />;
 }
 
 // Server component to fetch and display all powers
 async function AllPowers() {
   const powers = await getAllPowers();
-  return <PowersGrid powers={powers} />;
+  return <Grid items={powers} />;
 }
 
 export default function PowersPage() {

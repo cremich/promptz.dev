@@ -1,10 +1,6 @@
 import Image from "next/image";
 import { Suspense } from "react";
-import { PromptsGrid, PromptsGridSkeleton } from "@/components/prompts-grid";
-import { SteeringGrid, SteeringGridSkeleton } from "@/components/steering-grid";
-import { AgentsGrid, AgentsGridSkeleton } from "@/components/agents-grid";
-import { HooksGrid, HooksGridSkeleton } from "@/components/hooks-grid";
-import { PowersGrid, PowersGridSkeleton } from "@/components/powers-grid";
+import { Grid, GridSkeleton } from "@/components/grid";
 import { getLatestPrompts } from "@/lib/prompts";
 import { getLatestSteering } from "@/lib/steering";
 import { getLatestAgents } from "@/lib/agents";
@@ -12,58 +8,38 @@ import { getLatestHooks } from "@/lib/hooks";
 import { getLatestPowers } from "@/lib/powers";
 
 // Loading component for Suspense boundary
-function PromptsLoading() {
-  return <PromptsGridSkeleton count={6} />;
-}
-
-// Loading component for Steering Suspense boundary
-function SteeringLoading() {
-  return <SteeringGridSkeleton count={6} />;
-}
-
-// Loading component for Agents Suspense boundary
-function AgentsLoading() {
-  return <AgentsGridSkeleton count={6} />;
-}
-
-// Loading component for Hooks Suspense boundary
-function HooksLoading() {
-  return <HooksGridSkeleton count={6} />;
-}
-
-// Loading component for Powers Suspense boundary
-function PowersLoading() {
-  return <PowersGridSkeleton count={6} />;
+function ContentLoading() {
+  return <GridSkeleton count={6} />;
 }
 
 // Server component to fetch and display prompts
 async function LatestPrompts() {
   const prompts = await getLatestPrompts(6);
-  return <PromptsGrid prompts={prompts} maxItems={6} />;
+  return <Grid items={prompts} maxItems={6} />;
 }
 
 // Server component to fetch and display steering documents
 async function LatestSteering() {
   const steering = await getLatestSteering(6);
-  return <SteeringGrid steering={steering} maxItems={6} />;
+  return <Grid items={steering} maxItems={6} />;
 }
 
 // Server component to fetch and display agents
 async function LatestAgents() {
   const agents = await getLatestAgents(6);
-  return <AgentsGrid agents={agents} maxItems={6} />;
+  return <Grid items={agents} maxItems={6} />;
 }
 
 // Server component to fetch and display hooks
 async function LatestHooks() {
   const hooks = await getLatestHooks(6);
-  return <HooksGrid hooks={hooks} maxItems={6} />;
+  return <Grid items={hooks} maxItems={6} />;
 }
 
 // Server component to fetch and display powers
 async function LatestPowers() {
   const powers = await getLatestPowers(6);
-  return <PowersGrid powers={powers} maxItems={6} />;
+  return <Grid items={powers} maxItems={6} />;
 }
 
 export default function Home() {
@@ -119,7 +95,7 @@ export default function Home() {
             </a>
           </div>
           
-          <Suspense fallback={<PromptsLoading />}>
+          <Suspense fallback={<ContentLoading />}>
             <LatestPrompts />
           </Suspense>
         </section>
@@ -138,7 +114,7 @@ export default function Home() {
             </a>
           </div>
           
-          <Suspense fallback={<AgentsLoading />}>
+          <Suspense fallback={<ContentLoading />}>
             <LatestAgents />
           </Suspense>
         </section>
@@ -157,7 +133,7 @@ export default function Home() {
             </a>
           </div>
           
-          <Suspense fallback={<PowersLoading />}>
+          <Suspense fallback={<ContentLoading />}>
             <LatestPowers />
           </Suspense>
         </section>
@@ -176,7 +152,7 @@ export default function Home() {
             </a>
           </div>
           
-          <Suspense fallback={<SteeringLoading />}>
+          <Suspense fallback={<ContentLoading />}>
             <LatestSteering />
           </Suspense>
         </section>
@@ -195,7 +171,7 @@ export default function Home() {
             </a>
           </div>
           
-          <Suspense fallback={<HooksLoading />}>
+          <Suspense fallback={<ContentLoading />}>
             <LatestHooks />
           </Suspense>
         </section>

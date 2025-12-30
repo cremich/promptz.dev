@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
-import { SteeringGrid, SteeringGridSkeleton } from "@/components/steering-grid";
+import { Grid, GridSkeleton } from "@/components/grid";
 import { getAllSteering } from "@/lib/steering";
 
 // SEO metadata for the steering page
@@ -22,13 +22,13 @@ export const metadata: Metadata = {
 
 // Loading component for Suspense boundary
 function SteeringLoading() {
-  return <SteeringGridSkeleton count={12} />;
+  return <GridSkeleton count={12} />;
 }
 
 // Server component to fetch and display all steering documents
 async function AllSteering() {
   const steering = await getAllSteering();
-  return <SteeringGrid steering={steering} />;
+  return <Grid items={steering} />;
 }
 
 export default function SteeringPage() {

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
-import { HooksGrid, HooksGridSkeleton } from "@/components/hooks-grid";
+import { Grid, GridSkeleton } from "@/components/grid";
 import { getAllHooks } from "@/lib/hooks";
 
 // SEO metadata for the hooks page
@@ -22,13 +22,13 @@ export const metadata: Metadata = {
 
 // Loading component for Suspense boundary
 function HooksLoading() {
-  return <HooksGridSkeleton count={12} />;
+  return <GridSkeleton count={12} />;
 }
 
 // Server component to fetch and display all hooks
 async function AllHooks() {
   const hooks = await getAllHooks();
-  return <HooksGrid hooks={hooks} />;
+  return <Grid items={hooks} />;
 }
 
 export default function HooksPage() {

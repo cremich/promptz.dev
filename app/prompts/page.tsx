@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
-import { PromptsGrid, PromptsGridSkeleton } from "@/components/prompts-grid";
+import { Grid, GridSkeleton } from "@/components/grid";
 import { getAllPrompts } from "@/lib/prompts";
 
 // SEO metadata for the prompts page
@@ -22,13 +22,13 @@ export const metadata: Metadata = {
 
 // Loading component for Suspense boundary
 function PromptsLoading() {
-  return <PromptsGridSkeleton count={12} />;
+  return <GridSkeleton count={12} />;
 }
 
 // Server component to fetch and display all prompts
 async function AllPrompts() {
   const prompts = await getAllPrompts();
-  return <PromptsGrid prompts={prompts} />;
+  return <Grid items={prompts} />;
 }
 
 export default function PromptsPage() {
