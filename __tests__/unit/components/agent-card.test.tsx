@@ -81,7 +81,12 @@ describe('AgentCard', () => {
   it('should apply custom className when provided', () => {
     const { container } = render(<AgentCard agent={mockAgent} className="custom-class" />)
     
-    expect(container.firstChild).toHaveClass('custom-class')
+    // The className is applied to the Card component, which is inside the Link wrapper
+    const linkElement = container.firstChild as HTMLElement
+    const cardElement = linkElement.firstChild as HTMLElement
+    
+    expect(linkElement).toHaveClass('block') // Link has block class
+    expect(cardElement).toHaveClass('custom-class') // Card has the custom class
   })
 
   it('should render all required sections', () => {

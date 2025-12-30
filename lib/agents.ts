@@ -58,3 +58,24 @@ export const getLatestAgents = cache(async (limit?: number): Promise<Agent[]> =>
     return []
   }
 })
+
+/**
+ * Get a specific agent by ID
+ * Used for detail pages to display individual agents
+ * Returns null if agent is not found
+ */
+export const getAgentById = cache(async (id: string): Promise<Agent | null> => {
+  try {
+    const allAgents = await getAllAgents()
+    
+    // Find agent with matching ID
+    const agent = allAgents.find(a => a.id === id)
+    
+    return agent || null
+    
+  } catch (error) {
+    console.error(`Error fetching agent with ID ${id}:`, error)
+    // Return null on error to trigger 404 page
+    return null
+  }
+})
