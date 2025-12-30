@@ -256,16 +256,41 @@ export async function extractHookMetadata(
     const content = await safeFileRead(hookPath)
     if (!content) return null
     
-    const parsed = parseYamlFrontmatter(content)
-    const { data } = parsed
+    // Try to parse as JSON first (for .kiro.hook files)
+    let data: Record<string, unknown>
+    let hookContent = content
+    
+    try {
+      const jsonData = JSON.parse(content)
+      data = jsonData
+      // For JSON hooks, use the entire JSON as content
+      hookContent = content
+    } catch {
+      // If JSON parsing fails, try YAML frontmatter
+      const parsed = parseYamlFrontmatter(content)
+      data = parsed.data
+      hookContent = parsed.content
+    }
     
     // Get author and date with git fallback (use file for hooks)
     const { author, date, git } = await getAuthorAndDate(data, hookPath, false)
     
     const hookName = path.basename(hookFile, '.kiro.hook')
     const id = generatePathId(libraryName, 'hooks', hookName)
-    const title = typeof data.title === 'string' ? data.title : generateTitleFromFilename(hookName)
-    const trigger = typeof data.trigger === 'string' ? data.trigger : undefined
+    
+    // Extract title from name or title field
+    const title = typeof data.title === 'string' ? data.title : 
+                  typeof data.name === 'string' ? data.name : 
+                  generateTitleFromFilename(hookName)
+    
+    // Extract description - required field for hooks
+    const description = typeof data.description === 'string' ? data.description : 'Hook automation tool'
+    
+    // Extract trigger information
+    const trigger = typeof data.trigger === 'string' ? data.trigger :
+                   (data.when && typeof data.when === 'object' && 
+                    typeof (data.when as Record<string, unknown>).type === 'string') ? 
+                    (data.when as Record<string, unknown>).type as string : undefined
     
     return {
       type: 'hook',
@@ -275,7 +300,8 @@ export async function extractHookMetadata(
       date,
       path: hookPath,
       git,
-      content: parsed.content,
+      description,
+      content: hookContent,
       trigger
     }
   } catch (error) {

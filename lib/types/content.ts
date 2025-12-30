@@ -55,6 +55,7 @@ export interface SteeringDocument extends BaseContent {
 
 export interface Hook extends BaseContent {
   type: 'hook'
+  description: string
   content: string
   trigger?: string
 }

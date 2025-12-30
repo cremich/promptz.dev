@@ -3,9 +3,11 @@ import { Suspense } from "react";
 import { PromptsGrid, PromptsGridSkeleton } from "@/components/prompts-grid";
 import { SteeringGrid, SteeringGridSkeleton } from "@/components/steering-grid";
 import { AgentsGrid, AgentsGridSkeleton } from "@/components/agents-grid";
+import { HooksGrid, HooksGridSkeleton } from "@/components/hooks-grid";
 import { getLatestPrompts } from "@/lib/prompts";
 import { getLatestSteering } from "@/lib/steering";
 import { getLatestAgents } from "@/lib/agents";
+import { getLatestHooks } from "@/lib/hooks";
 
 // Loading component for Suspense boundary
 function PromptsLoading() {
@@ -20,6 +22,11 @@ function SteeringLoading() {
 // Loading component for Agents Suspense boundary
 function AgentsLoading() {
   return <AgentsGridSkeleton count={6} />;
+}
+
+// Loading component for Hooks Suspense boundary
+function HooksLoading() {
+  return <HooksGridSkeleton count={6} />;
 }
 
 // Server component to fetch and display prompts
@@ -40,6 +47,12 @@ async function LatestAgents() {
   return <AgentsGrid agents={agents} maxItems={6} />;
 }
 
+// Server component to fetch and display hooks
+async function LatestHooks() {
+  const hooks = await getLatestHooks(6);
+  return <HooksGrid hooks={hooks} maxItems={6} />;
+}
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
@@ -58,7 +71,7 @@ export default function Home() {
             AI Development Prompts & Resources
           </h1>
           <p className="max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400 mb-8">
-            Discover the latest AI development prompts, custom agents, steering documents, and resources 
+            Discover the latest AI development prompts, custom agents, steering documents, agent hooks, and resources 
             to enhance your development workflow with Kiro and Amazon Q Developer.
           </p>
           <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
@@ -133,6 +146,25 @@ export default function Home() {
           
           <Suspense fallback={<SteeringLoading />}>
             <LatestSteering />
+          </Suspense>
+        </section>
+
+        {/* Latest Agent Hooks Section */}
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
+              Latest Agent Hooks
+            </h2>
+            <a
+              href="/hooks"
+              className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-50 transition-colors"
+            >
+              View all →
+            </a>
+          </div>
+          
+          <Suspense fallback={<HooksLoading />}>
+            <LatestHooks />
           </Suspense>
         </section>
       </main>
