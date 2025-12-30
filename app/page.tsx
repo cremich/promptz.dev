@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Suspense } from "react";
 import { Grid, GridSkeleton } from "@/components/grid";
 import { getLatestPrompts } from "@/lib/prompts";
@@ -64,12 +65,12 @@ export default function Home() {
             to enhance your development workflow with Kiro and Amazon Q Developer.
           </p>
           <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-            <a
+            <Link
               className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-6 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[180px]"
               href="/prompts"
             >
               Browse All Prompts
-            </a>
+            </Link>
             <a
               className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-6 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[180px]"
               href="https://github.com/promptz-dev/promptz"
@@ -87,12 +88,12 @@ export default function Home() {
             <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
               Latest Prompts
             </h2>
-            <a
+            <Link
               href="/prompts"
               className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-50 transition-colors"
             >
               View all →
-            </a>
+            </Link>
           </div>
           
           <Suspense fallback={<ContentLoading />}>
@@ -106,12 +107,12 @@ export default function Home() {
             <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
               Latest Custom Agents
             </h2>
-            <a
+            <Link
               href="/agents"
               className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-50 transition-colors"
             >
               View all →
-            </a>
+            </Link>
           </div>
           
           <Suspense fallback={<ContentLoading />}>
@@ -125,12 +126,12 @@ export default function Home() {
             <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
               Latest Kiro Powers
             </h2>
-            <a
+            <Link
               href="/powers"
               className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-50 transition-colors"
             >
               View all →
-            </a>
+            </Link>
           </div>
           
           <Suspense fallback={<ContentLoading />}>
@@ -144,12 +145,12 @@ export default function Home() {
             <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
               Latest Steering Documents
             </h2>
-            <a
+            <Link
               href="/steering"
               className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-50 transition-colors"
             >
               View all →
-            </a>
+            </Link>
           </div>
           
           <Suspense fallback={<ContentLoading />}>
@@ -163,12 +164,12 @@ export default function Home() {
             <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
               Latest Agent Hooks
             </h2>
-            <a
+            <Link
               href="/hooks"
               className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-50 transition-colors"
             >
               View all →
-            </a>
+            </Link>
           </div>
           
           <Suspense fallback={<ContentLoading />}>

@@ -33,7 +33,7 @@ jest.mock('@/lib/utils/badge-utils', () => ({
 
 describe('PromptCard', () => {
   const mockPrompt: Prompt = {
-    id: 'test-prompt',
+    id: 'promptz/prompts/test-prompt',
     title: 'Test Prompt',
     author: 'Test Author',
     date: '2024-01-15',
@@ -62,7 +62,7 @@ describe('PromptCard', () => {
     render(<PromptCard prompt={mockPrompt} />)
     
     expect(screen.getByText('ID:')).toBeInTheDocument()
-    expect(screen.getByText('test-prompt')).toBeInTheDocument()
+    expect(screen.getByText('promptz/prompts/test-prompt')).toBeInTheDocument()
   })
 
   it('should show prompt type badge', () => {
@@ -116,6 +116,7 @@ describe('PromptCard', () => {
   it('should extract library name from different paths', () => {
     const kiroPrompt: Prompt = {
       ...mockPrompt,
+      id: 'kiro-powers/prompts/test',
       path: 'libraries/kiro-powers/prompts/test.md'
     }
     
@@ -127,6 +128,7 @@ describe('PromptCard', () => {
   it('should handle unknown library paths', () => {
     const unknownPrompt: Prompt = {
       ...mockPrompt,
+      id: 'unknown/prompts/test',
       path: 'some/other/path/test.md'
     }
     

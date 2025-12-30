@@ -53,3 +53,23 @@ export const getLatestPrompts = cache(async (limit?: number): Promise<Prompt[]> 
     return []
   }
 })
+
+/**
+ * Get a single prompt by ID
+ * ID format: {library}/{contentType}/{filename} (e.g., "promptz/prompts/api-testing")
+ * Returns null if prompt not found
+ */
+export const getPromptById = cache(async (id: string): Promise<Prompt | null> => {
+  try {
+    const allPrompts = await getAllPrompts()
+    
+    // Find prompt with matching ID
+    const prompt = allPrompts.find(p => p.id === id)
+    
+    return prompt || null
+    
+  } catch (error) {
+    console.error('Error fetching prompt by ID:', error)
+    return null
+  }
+})
