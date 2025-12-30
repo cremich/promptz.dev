@@ -31,9 +31,15 @@
         "init"
       ]
     },
-     "shadcn": {
+    "shadcn": {
       "command": "npx",
-      "args": ["shadcn@latest", "mcp"]
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ],
+      "autoApprove": [
+        "list_items_in_registries"
+      ]
     }
   }
 }
