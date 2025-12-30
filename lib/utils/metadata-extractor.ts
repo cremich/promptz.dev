@@ -4,7 +4,9 @@ import {
   parseYamlFrontmatter, 
   parseJsonConfig, 
   generateTitleFromFilename,
-  generatePathId 
+  generatePathId,
+  directoryExists,
+  getFilesWithExtension
 } from './file-parser'
 import { 
   extractGitFileInfo, 
@@ -88,6 +90,12 @@ export async function extractPowerMetadata(
     const displayName = typeof data.displayName === 'string' ? data.displayName : name
     const keywords = Array.isArray(data.keywords) ? data.keywords : []
     
+    // Scan for steering files in the steering subdirectory
+    const steeringPath = path.join(powerPath, 'steering')
+    const steeringFiles = (await directoryExists(steeringPath)) 
+      ? await getFilesWithExtension(steeringPath, '.md')
+      : []
+    
     return {
       type: 'power',
       id,
@@ -101,7 +109,7 @@ export async function extractPowerMetadata(
       keywords,
       content: parsed.content,
       mcpConfig: (await parseJsonConfig(path.join(powerPath, 'mcp.json'))) || undefined,
-      steeringFiles: [] // TODO: scan steering directory
+      steeringFiles: steeringFiles.length > 0 ? steeringFiles : undefined
     }
   } catch (error) {
     console.warn(`Failed to extract power metadata: ${powerDir}`, error)

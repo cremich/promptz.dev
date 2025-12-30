@@ -2,6 +2,13 @@ import { render, screen } from '@testing-library/react'
 import { PowerCard, PowerCardSkeleton } from '@/components/power-card'
 import type { Power } from '@/lib/types/content'
 
+// Mock Next.js Link component
+jest.mock('next/link', () => {
+  return function MockLink({ children, href }: { children: React.ReactNode; href: string }) {
+    return <a href={href}>{children}</a>
+  }
+})
+
 // Mock the git utility functions
 jest.mock('@/lib/utils/git-extractor', () => ({
   getShortHash: jest.fn((hash: string) => hash.substring(0, 7))
@@ -11,6 +18,21 @@ jest.mock('@/lib/utils/git-extractor', () => ({
 jest.mock('@/lib/utils/date-formatter', () => ({
   getFormattedDisplayDate: jest.fn(() => 'Jan 15, 2024')
 }))
+
+// Mock the slug utilities
+jest.mock('@/lib/utils/slug-utils', () => ({
+  idToSlug: jest.fn((id: string) => {
+    // Convert "kiro-powers/powers/stripe" to "kiro-powers-power-stripe"
+    const parts = id.split('/')
+    if (parts.length !== 3) return id
+    const [library, type, name] = parts
+    const singularType = type.endsWith('s') ? type.slice(0, -1) : type
+    return `${library}-${singularType}-${name}`
+  })
+}))
+
+// Import the mocked function for testing
+import { idToSlug } from '@/lib/utils/slug-utils'
 
 // Mock the badge utility functions
 jest.mock('@/lib/utils/badge-utils', () => ({
@@ -33,7 +55,7 @@ jest.mock('@/lib/utils/badge-utils', () => ({
 
 describe('PowerCard', () => {
   const mockPower: Power = {
-    id: 'test-power',
+    id: 'kiro-powers/powers/stripe',
     title: 'Test Power',
     displayName: 'Test Power Display',
     author: 'Test Author',
@@ -52,6 +74,21 @@ describe('PowerCard', () => {
       commitMessage: 'Add test power'
     }
   }
+
+  it('should render as a clickable link to the power detail page', () => {
+    render(<PowerCard power={mockPower} />)
+    
+    const link = screen.getByRole('link')
+    expect(link).toBeInTheDocument()
+    expect(link).toHaveAttribute('href', '/powers/kiro-powers-power-stripe')
+  })
+
+  it('should have hover styles for better UX', () => {
+    const { container } = render(<PowerCard power={mockPower} />)
+    
+    const card = container.querySelector('[data-slot="card"]')
+    expect(card).toHaveClass('hover:bg-zinc-100', 'dark:hover:bg-zinc-900')
+  })
 
   it('should render power displayName prominently', () => {
     render(<PowerCard power={mockPower} />)
@@ -82,7 +119,7 @@ describe('PowerCard', () => {
     render(<PowerCard power={mockPower} />)
     
     expect(screen.getByText('ID:')).toBeInTheDocument()
-    expect(screen.getByText('test-power')).toBeInTheDocument()
+    expect(screen.getByText('kiro-powers/powers/stripe')).toBeInTheDocument()
   })
 
   it('should show power type badge', () => {
@@ -173,6 +210,7 @@ describe('PowerCard', () => {
   it('should extract library name from different paths', () => {
     const promptzPower: Power = {
       ...mockPower,
+      id: 'promptz/powers/test',
       path: 'libraries/promptz/powers/test.md'
     }
     
@@ -184,12 +222,22 @@ describe('PowerCard', () => {
   it('should handle unknown library paths', () => {
     const unknownPower: Power = {
       ...mockPower,
+      id: 'unknown/powers/test',
       path: 'some/other/path/test.md'
     }
     
     render(<PowerCard power={unknownPower} />)
     
     expect(screen.getByText('unknown')).toBeInTheDocument()
+  })
+
+  it('should generate correct slug for power detail page link', () => {
+    render(<PowerCard power={mockPower} />)
+    
+    expect(idToSlug).toHaveBeenCalledWith('kiro-powers/powers/stripe')
+    
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute('href', '/powers/kiro-powers-power-stripe')
   })
 })
 

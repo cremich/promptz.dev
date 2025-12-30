@@ -61,3 +61,24 @@ export const getLatestPowers = cache(async (limit?: number): Promise<Power[]> =>
     return []
   }
 })
+
+/**
+ * Get a specific power by its ID
+ * Used for power detail pages
+ * Returns null if power is not found
+ */
+export const getPowerById = cache(async (id: string): Promise<Power | null> => {
+  try {
+    const allPowers = await getAllPowers()
+    
+    // Find power by exact ID match
+    const power = allPowers.find(p => p.id === id)
+    
+    return power || null
+    
+  } catch (error) {
+    console.error('Error fetching power by ID:', error)
+    // Return null on error to trigger 404 page
+    return null
+  }
+})
