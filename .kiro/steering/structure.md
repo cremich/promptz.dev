@@ -5,11 +5,35 @@
 ```
 promptz.dev/
 ├── app/                    # Next.js App Router pages and layouts
+│   ├── agents/             # Custom agents listing page
+│   ├── hooks/              # Agent hooks listing page
+│   ├── powers/             # Kiro powers listing page
+│   ├── prompts/            # Prompts listing page
+│   ├── steering/           # Steering documents listing page
+│   ├── test-content/       # Content service testing interface
+│   ├── layout.tsx          # Root layout with fonts and metadata
+│   ├── page.tsx            # Homepage with latest content sections
+│   ├── globals.css         # Global styles with Tailwind imports
+│   └── favicon.ico         # Site favicon
+├── components/             # React components
+│   ├── ui/                 # Shadcn UI components
+│   ├── *-card.tsx          # Content type-specific card components
+│   └── grid.tsx            # Responsive grid with skeleton states
 ├── lib/                    # Content service and utilities
 │   ├── types/              # TypeScript type definitions
 │   ├── utils/              # Utility functions and parsers
-│   └── content-service.ts  # Main content service with caching
+│   ├── content-service.ts  # Main content service with caching
+│   ├── prompts.ts          # Prompts-specific service functions
+│   ├── agents.ts           # Agents-specific service functions
+│   ├── powers.ts           # Powers-specific service functions
+│   ├── steering.ts         # Steering-specific service functions
+│   └── hooks.ts            # Hooks-specific service functions
 ├── libraries/              # Git submodules for content libraries
+│   ├── kiro-powers/        # Official Kiro powers library
+│   └── promptz/            # Community prompts and resources
+├── __tests__/              # Test suites
+│   ├── unit/               # Unit tests for components and utilities
+│   └── property/           # Property-based tests (ephemeral)
 ├── public/                 # Static assets (images, icons, fonts)
 ├── .kiro/                  # Kiro configuration and steering files
 ├── .next/                  # Next.js build output (generated)
@@ -24,7 +48,9 @@ promptz.dev/
 - **lib/utils/file-parser.ts**: File system utilities and parsing functions
 - **lib/utils/metadata-extractor.ts**: Content-specific metadata extraction logic
 - **lib/utils/git-extractor.ts**: Git history analysis and information extraction
+- **lib/utils/date-formatter.ts**: Date formatting and comparison utilities
 - **lib/content-service.ts**: Main service with React cache integration
+- **lib/{type}.ts**: Type-specific service functions (prompts.ts, agents.ts, etc.)
 
 ### Content Service Features
 - **Type-safe content processing**: Union types enable cross-content operations
@@ -50,12 +76,46 @@ interface BaseContent {
 }
 ```
 
-## App Directory Structure
+## App Directory Structure (Next.js 16 App Router)
 
-- **app/layout.tsx**: Root layout with global styles and font configuration
-- **app/page.tsx**: Homepage component with main landing content
+### Core Pages
+- **app/layout.tsx**: Root layout with Geist fonts, global styles, and metadata
+- **app/page.tsx**: Homepage with server components and Suspense boundaries
 - **app/globals.css**: Global CSS with Tailwind imports and custom properties
 - **app/favicon.ico**: Site favicon and branding assets
+
+### Content Type Pages
+- **app/prompts/page.tsx**: Prompts listing with server-side data fetching
+- **app/agents/page.tsx**: Custom agents listing with metadata display
+- **app/powers/page.tsx**: Kiro powers listing with MCP configuration info
+- **app/steering/page.tsx**: Steering documents listing with category filtering
+- **app/hooks/page.tsx**: Agent hooks listing with trigger information
+
+### Testing Interface
+- **app/test-content/**: Content service testing and validation interface
+- **app/test-content/components/**: Test-specific components for debugging
+
+## Components Architecture
+
+### UI Components (Shadcn UI)
+- **components/ui/card.tsx**: Base card component with variants
+- **components/ui/badge.tsx**: Badge component for tags and categories
+- **components/ui/skeleton.tsx**: Loading skeleton components
+
+### Content Components
+- **components/grid.tsx**: Responsive grid with type-safe rendering and skeleton states
+- **components/prompt-card.tsx**: Prompt display card with metadata
+- **components/agent-card.tsx**: Agent card with configuration preview
+- **components/power-card.tsx**: Power card with keywords and MCP info
+- **components/steering-card.tsx**: Steering document card with category
+- **components/hook-card.tsx**: Hook card with trigger information
+
+### Component Features
+- **Type-safe rendering**: Union type discrimination for content cards
+- **Skeleton states**: Loading placeholders for all content types
+- **Responsive design**: Mobile-first with Tailwind breakpoints
+- **Accessibility**: ARIA labels, semantic HTML, keyboard navigation
+- **Dark mode support**: CSS variables and Tailwind dark mode utilities
 
 ## Libraries Directory (Git Submodules)
 
@@ -76,12 +136,14 @@ Community-driven library for AI development resources:
 ## Configuration Files Location
 
 ### Root Level
-- **package.json**: Dependencies, scripts, and project metadata
+- **package.json**: Dependencies, scripts, and project metadata with Next.js 16 and React 19
 - **next.config.ts**: Next.js configuration with TypeScript
-- **tsconfig.json**: TypeScript compiler configuration with strict mode
-- **eslint.config.mjs**: ESLint rules for Next.js and TypeScript
-- **postcss.config.mjs**: PostCSS configuration for Tailwind CSS
-- **.gitmodules**: Git submodule configuration for libraries
+- **tsconfig.json**: TypeScript compiler configuration with strict mode and path mapping
+- **eslint.config.mjs**: ESLint rules for Next.js and TypeScript with Prettier integration
+- **postcss.config.mjs**: PostCSS configuration for Tailwind CSS processing
+- **jest.config.ts**: Jest testing configuration with Next.js integration
+- **jest.setup.ts**: Jest setup with React Testing Library
+- **.gitmodules**: Git submodule configuration for content libraries
 - **.gitignore**: Git ignore patterns for build artifacts and dependencies
 
 ### Kiro Configuration
@@ -130,6 +192,20 @@ prompts/
 - **Relative imports**: Preferred for local files within same feature
 - **Absolute imports**: Used for shared utilities and components
 
+## Testing Structure
+
+### Test Organization
+- **__tests__/unit/**: Unit tests mirroring source structure
+- **__tests__/property/**: Property-based tests (ephemeral, not committed)
+- **Jest configuration**: Next.js integration with jsdom environment
+- **Testing utilities**: React Testing Library with custom matchers
+
+### Test Patterns
+- **Component testing**: Render testing with user interactions
+- **Service testing**: Content service with mocked file system
+- **Integration testing**: Full content processing workflows
+- **Property testing**: AI-assisted validation during development
+
 ## Asset Organization
 
 ### Public Directory
@@ -140,7 +216,7 @@ prompts/
 ### App Directory Assets
 - **Component-specific assets**: Co-located with components when possible
 - **Global styles**: CSS files imported in layout.tsx
-- **Font files**: Loaded via Next.js font optimization
+- **Font files**: Loaded via Next.js font optimization (Geist Sans/Mono)
 
 ## Build Output Structure
 
@@ -160,7 +236,8 @@ prompts/
 1. **Type definitions**: Start with `lib/types/content.ts` for new content types
 2. **Metadata extraction**: Add extractors in `lib/utils/metadata-extractor.ts`
 3. **Service integration**: Update `lib/content-service.ts` for new content sources
-4. **Testing**: Validate with test components and git integration showcase
+4. **Type-specific services**: Create dedicated service files (e.g., `lib/prompts.ts`)
+5. **Testing**: Validate with test components and git integration showcase
 
 ### Content Contribution
 1. **Fork library**: Create fork of specific library repository
