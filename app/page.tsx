@@ -4,10 +4,12 @@ import { PromptsGrid, PromptsGridSkeleton } from "@/components/prompts-grid";
 import { SteeringGrid, SteeringGridSkeleton } from "@/components/steering-grid";
 import { AgentsGrid, AgentsGridSkeleton } from "@/components/agents-grid";
 import { HooksGrid, HooksGridSkeleton } from "@/components/hooks-grid";
+import { PowersGrid, PowersGridSkeleton } from "@/components/powers-grid";
 import { getLatestPrompts } from "@/lib/prompts";
 import { getLatestSteering } from "@/lib/steering";
 import { getLatestAgents } from "@/lib/agents";
 import { getLatestHooks } from "@/lib/hooks";
+import { getLatestPowers } from "@/lib/powers";
 
 // Loading component for Suspense boundary
 function PromptsLoading() {
@@ -27,6 +29,11 @@ function AgentsLoading() {
 // Loading component for Hooks Suspense boundary
 function HooksLoading() {
   return <HooksGridSkeleton count={6} />;
+}
+
+// Loading component for Powers Suspense boundary
+function PowersLoading() {
+  return <PowersGridSkeleton count={6} />;
 }
 
 // Server component to fetch and display prompts
@@ -53,6 +60,12 @@ async function LatestHooks() {
   return <HooksGrid hooks={hooks} maxItems={6} />;
 }
 
+// Server component to fetch and display powers
+async function LatestPowers() {
+  const powers = await getLatestPowers(6);
+  return <PowersGrid powers={powers} maxItems={6} />;
+}
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
@@ -71,7 +84,7 @@ export default function Home() {
             AI Development Prompts & Resources
           </h1>
           <p className="max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400 mb-8">
-            Discover the latest AI development prompts, custom agents, steering documents, agent hooks, and resources 
+            Discover the latest AI development prompts, custom agents, steering documents, agent hooks, Kiro powers, and resources 
             to enhance your development workflow with Kiro and Amazon Q Developer.
           </p>
           <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
@@ -127,6 +140,25 @@ export default function Home() {
           
           <Suspense fallback={<AgentsLoading />}>
             <LatestAgents />
+          </Suspense>
+        </section>
+
+        {/* Latest Powers Section */}
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-semibold text-black dark:text-zinc-50">
+              Latest Kiro Powers
+            </h2>
+            <a
+              href="/powers"
+              className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-50 transition-colors"
+            >
+              View all →
+            </a>
+          </div>
+          
+          <Suspense fallback={<PowersLoading />}>
+            <LatestPowers />
           </Suspense>
         </section>
 
