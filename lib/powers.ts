@@ -1,27 +1,20 @@
 import 'server-only'
 import { cache } from 'react'
-import { readPromptzLibrary, readKiroLibrary } from './content-service'
 import { compareDatesNewestFirst } from './utils/date-formatter'
 import type { Power } from './types/content'
 
+// Import static JSON data generated at build time
+import powersData from '@/data/powers.json'
+
 /**
  * Get all powers from all available libraries
- * Fetches from both promptz and kiro-powers libraries
+ * Uses static JSON data generated at build time for optimal performance
  * Handles errors gracefully by returning empty array on failure
  */
 export const getAllPowers = cache(async (): Promise<Power[]> => {
   try {
-    // Fetch both libraries in parallel
-    const [promptzLibrary, kiroLibrary] = await Promise.all([
-      readPromptzLibrary(),
-      readKiroLibrary()
-    ])
-    
-    // Combine powers from both libraries
-    const allPowers = [
-      ...promptzLibrary.powers,
-      ...kiroLibrary.powers
-    ]
+    // Cast imported JSON to proper TypeScript type
+    const allPowers = powersData as Power[]
     
     // Sort by creation date (newest first)
     // Use git creation date if available, otherwise fallback to frontmatter date

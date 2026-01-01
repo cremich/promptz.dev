@@ -18,6 +18,34 @@
       "command": "npx",
       "args": [
         "chrome-devtools-mcp@latest"
+      ],
+      "disabledTools": [
+        "click",
+        "close_page",
+        "drag",
+        "emulate",
+        "evaluate_script",
+        "fill",
+        "fill_form",
+        "get_console_message",
+        "get_network_request",
+        "handle_dialog",
+        "hover",
+        "list_console_messages",
+        "list_network_requests",
+        "list_pages",
+        "navigate_page",
+        "new_page",
+        "performance_analyze_insight",
+        "performance_start_trace",
+        "performance_stop_trace",
+        "press_key",
+        "resize_page",
+        "select_page",
+        "take_screenshot",
+        "take_snapshot",
+        "upload_file",
+        "wait_for"
       ]
     },
     "next-devtools": {

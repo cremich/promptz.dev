@@ -1,80 +1,15 @@
 import { getAllPrompts, getLatestPrompts } from '@/lib/prompts'
-import { readPromptzLibrary } from '@/lib/content-service'
-import type { Prompt, Library } from '@/lib/types/content'
 
-// Mock the content service functions
-jest.mock('@/lib/content-service', () => ({
-  readPromptzLibrary: jest.fn()
-}))
-
-const mockReadPromptzLibrary = readPromptzLibrary as jest.MockedFunction<typeof readPromptzLibrary>
+// Mock the JSON import - Jest will automatically use the mock file
+jest.mock('@/data/prompts.json', () => jest.requireActual('../../../__mocks__/data/prompts.json'))
 
 describe('Prompt utilities', () => {
-  const mockPromptA: Prompt = {
-    id: 'prompt-a',
-    title: 'Prompt A',
-    author: 'Author A',
-    date: '2024-01-15',
-    path: 'libraries/promptz/prompts/a.md',
-    type: 'prompt',
-    content: 'Content A',
-    git: {
-      author: 'Git Author A',
-      authorEmail: 'a@example.com',
-      createdDate: '2024-01-15T10:00:00Z',
-      lastModifiedDate: '2024-01-15T10:00:00Z',
-      commitHash: 'abc123',
-      commitMessage: 'Add prompt A'
-    }
-  }
-
-  const mockPromptB: Prompt = {
-    id: 'prompt-b',
-    title: 'Prompt B',
-    author: 'Author B',
-    date: '2024-01-16',
-    path: 'libraries/promptz/prompts/b.md',
-    type: 'prompt',
-    content: 'Content B',
-    git: {
-      author: 'Git Author B',
-      authorEmail: 'b@example.com',
-      createdDate: '2024-01-16T10:00:00Z',
-      lastModifiedDate: '2024-01-16T10:00:00Z',
-      commitHash: 'def456',
-      commitMessage: 'Add prompt B'
-    }
-  }
-
-  const mockPromptC: Prompt = {
-    id: 'prompt-c',
-    title: 'Prompt C',
-    author: 'Author C',
-    date: '2024-01-14',
-    path: 'libraries/promptz/prompts/c.md',
-    type: 'prompt',
-    content: 'Content C'
-    // No git info - should use frontmatter date
-  }
-
-  const mockPromptzLibrary: Library = {
-    name: 'promptz',
-    path: 'libraries/promptz',
-    prompts: [mockPromptA, mockPromptB, mockPromptC],
-    agents: [],
-    powers: [],
-    steering: [],
-    hooks: []
-  }
-
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   describe('getAllPrompts', () => {
-    it('should fetch prompts from promptz library and sort by date', async () => {
-      mockReadPromptzLibrary.mockResolvedValue(mockPromptzLibrary)
-
+    it('should fetch prompts from JSON data and sort by date', async () => {
       const result = await getAllPrompts()
 
       expect(result).toHaveLength(3)
@@ -84,20 +19,27 @@ describe('Prompt utilities', () => {
       expect(result[2].id).toBe('prompt-c')
     })
 
-    it('should return empty array when promptz library fails', async () => {
-      mockReadPromptzLibrary.mockRejectedValue(new Error('Promptz library error'))
-
-      const result = await getAllPrompts()
+    it('should return empty array when JSON processing fails', async () => {
+      // Mock console.error to avoid noise in test output
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      
+      // Mock the JSON data to be invalid
+      jest.doMock('@/data/prompts.json', () => null)
+      
+      // Re-import the module to get the new mock
+      jest.resetModules()
+      const { getAllPrompts: getAllPromptsWithError } = await import('@/lib/prompts')
+      
+      const result = await getAllPromptsWithError()
 
       expect(result).toHaveLength(0)
+      expect(consoleSpy).toHaveBeenCalledWith('Error fetching prompts:', expect.any(Error))
+      
+      consoleSpy.mockRestore()
     })
   })
 
   describe('getLatestPrompts', () => {
-    beforeEach(() => {
-      mockReadPromptzLibrary.mockResolvedValue(mockPromptzLibrary)
-    })
-
     it('should return all prompts when no limit is specified', async () => {
       const result = await getLatestPrompts()
 
@@ -127,11 +69,22 @@ describe('Prompt utilities', () => {
     })
 
     it('should handle errors gracefully', async () => {
-      mockReadPromptzLibrary.mockRejectedValue(new Error('Error'))
+      // Mock console.error to avoid noise in test output
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      
+      // Mock the JSON data to be invalid
+      jest.doMock('@/data/prompts.json', () => null)
+      
+      // Re-import the module to get the new mock
+      jest.resetModules()
+      const { getLatestPrompts: getLatestPromptsWithError } = await import('@/lib/prompts')
 
-      const result = await getLatestPrompts(5)
+      const result = await getLatestPromptsWithError(5)
 
       expect(result).toHaveLength(0)
+      expect(consoleSpy).toHaveBeenCalledWith('Error fetching prompts:', expect.any(Error))
+      
+      consoleSpy.mockRestore()
     })
   })
 })

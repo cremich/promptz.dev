@@ -1,19 +1,20 @@
 import 'server-only'
 import { cache } from 'react'
-import { readPromptzLibrary } from './content-service'
 import { compareDatesNewestFirst } from './utils/date-formatter'
 import type { Hook } from './types/content'
 
+// Import static JSON data generated at build time
+import hooksData from '@/data/hooks.json'
+
 /**
  * Get all hooks from all available libraries
- * Currently fetches from promptz library (kiro-powers contains only powers, not hooks)
+ * Uses static JSON data generated at build time for optimal performance
  * Handles errors gracefully by returning empty array on failure
  */
 export const getAllHooks = cache(async (): Promise<Hook[]> => {
   try {
-    // Fetch promptz library which contains the hooks
-    const promptzLibrary = await readPromptzLibrary()
-    const allHooks = promptzLibrary.hooks
+    // Cast imported JSON to proper TypeScript type
+    const allHooks = hooksData as Hook[]
     
     // Sort by creation date (newest first)
     // Use git creation date if available, otherwise fallback to frontmatter date

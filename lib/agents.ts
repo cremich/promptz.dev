@@ -1,19 +1,20 @@
 import 'server-only'
 import { cache } from 'react'
-import { readPromptzLibrary } from './content-service'
 import { compareDatesNewestFirst } from './utils/date-formatter'
 import type { Agent } from './types/content'
 
+// Import static JSON data generated at build time
+import agentsData from '@/data/agents.json'
+
 /**
  * Get all agents from all available libraries
- * Currently fetches from promptz library (kiro-powers contains only powers, not agents)
+ * Uses static JSON data generated at build time for optimal performance
  * Handles errors gracefully by returning empty array on failure
  */
 export const getAllAgents = cache(async (): Promise<Agent[]> => {
   try {
-    // Fetch promptz library which contains the agents
-    const promptzLibrary = await readPromptzLibrary()
-    const allAgents = promptzLibrary.agents
+    // Cast imported JSON to proper TypeScript type
+    const allAgents = agentsData as Agent[]
     
     // Sort by creation date (newest first)
     // Use git creation date if available, otherwise fallback to frontmatter date

@@ -1,19 +1,20 @@
 import 'server-only'
 import { cache } from 'react'
-import { readPromptzLibrary } from './content-service'
 import { compareDatesNewestFirst } from './utils/date-formatter'
 import type { Prompt } from './types/content'
 
+// Import static JSON data generated at build time
+import promptsData from '@/data/prompts.json'
+
 /**
  * Get all prompts from all available libraries
- * Currently fetches from promptz library (kiro-powers contains only powers, not prompts)
+ * Uses static JSON data generated at build time for optimal performance
  * Handles errors gracefully by returning empty array on failure
  */
 export const getAllPrompts = cache(async (): Promise<Prompt[]> => {
   try {
-    // Fetch promptz library which contains the prompts
-    const promptzLibrary = await readPromptzLibrary()
-    const allPrompts = promptzLibrary.prompts
+    // Cast imported JSON to proper TypeScript type
+    const allPrompts = promptsData as Prompt[]
     
     // Sort by creation date (newest first)
     // Use git creation date if available, otherwise fallback to frontmatter date

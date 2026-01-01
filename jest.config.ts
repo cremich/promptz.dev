@@ -14,6 +14,11 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
+    '@/data/prompts.json': "<rootDir>/__mocks__/data/prompts.json",
+    '@/data/agents.json': "<rootDir>/__mocks__/data/agents.json",
+    '@/data/powers.json': "<rootDir>/__mocks__/data/powers.json",
+    '@/data/steering.json': "<rootDir>/__mocks__/data/steering.json",
+    '@/data/hooks.json': "<rootDir>/__mocks__/data/hooks.json"
   },
 };
 
