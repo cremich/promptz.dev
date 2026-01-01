@@ -1,4 +1,4 @@
-import { idToSlug, slugToId, isValidSlug } from '@/lib/utils/slug-utils'
+import { idToSlug, slugToId, isValidSlug } from '@/lib/formatter/slug'
 
 describe('slug-utils', () => {
   describe('idToSlug', () => {

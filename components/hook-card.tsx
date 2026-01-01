@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getShortHash } from "@/lib/utils/git-extractor"
 import { getFormattedDisplayDate } from "@/lib/formatter/date"
-import { idToSlug } from "@/lib/utils/slug-utils"
+import { idToSlug } from "@/lib/formatter/slug"
 import { 
   getContentTypeBadgeVariant, 
   getLibraryBadgeVariant, 

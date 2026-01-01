@@ -8,7 +8,7 @@ import { ContentHeader } from "@/components/content-header";
 import { ContributorInfo } from "@/components/contributor-info";
 import { Keywords } from "@/components/keywords";
 import { getPowerById, getAllPowers } from "@/lib/powers";
-import { idToSlug, slugToId, isValidSlug } from "@/lib/utils/slug-utils";
+import { idToSlug, slugToId, isValidSlug } from "@/lib/formatter/slug";
 import { getLibraryName } from "@/lib/library";
 import type { Power } from "@/lib/types/content";
 

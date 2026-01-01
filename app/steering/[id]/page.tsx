@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { getSteeringById, getAllSteering } from "@/lib/steering";
 import { getFormattedDisplayDate } from "@/lib/formatter/date";
 import { getShortHash } from "@/lib/utils/git-extractor";
-import { idToSlug, slugToId, isValidSlug } from "@/lib/utils/slug-utils";
+import { idToSlug, slugToId, isValidSlug } from "@/lib/formatter/slug";
 import { 
   getContentTypeBadgeVariant, 
   getLibraryBadgeVariant, 

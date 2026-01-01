@@ -7,7 +7,7 @@ import { ContributorInfo } from "@/components/contributor-info";
 import { HookTriggerBadge } from "@/components/hook-trigger-badge";
 import { getHookById, getAllHooks } from "@/lib/hooks";
 import { getLibraryName } from "@/lib/library";
-import { idToSlug, slugToId, isValidSlug } from "@/lib/utils/slug-utils";
+import { idToSlug, slugToId, isValidSlug } from "@/lib/formatter/slug";
 import type { Hook } from "@/lib/types/content";
 
 interface HookDetailPageProps {

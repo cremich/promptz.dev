@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ContentHeader } from "@/components/content-header";
 import { ContributorInfo } from "@/components/contributor-info";
 import { getPromptById, getAllPrompts } from "@/lib/prompts";
-import { idToSlug, slugToId, isValidSlug } from "@/lib/utils/slug-utils";
+import { idToSlug, slugToId, isValidSlug } from "@/lib/formatter/slug";
 import { getLibraryName } from "@/lib/library";
 
 interface PromptDetailPageProps {

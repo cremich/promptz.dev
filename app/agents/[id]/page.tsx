@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContentHeader } from "@/components/content-header";
 import { ContributorInfo } from "@/components/contributor-info";
 import { getAllAgents, getAgentById } from "@/lib/agents";
-import { idToSlug, slugToId, isValidSlug } from "@/lib/utils/slug-utils";
+import { idToSlug, slugToId, isValidSlug } from "@/lib/formatter/slug";
 
 interface AgentDetailPageProps {
   params: Promise<{ id: string }>;

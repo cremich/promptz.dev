@@ -32,7 +32,7 @@ jest.mock('@/lib/utils/slug-utils', () => ({
 }))
 
 // Import the mocked function for testing
-import { idToSlug } from '@/lib/utils/slug-utils'
+import { idToSlug } from '@/lib/formatter/slug'
 
 // Mock the badge utility functions
 jest.mock('@/lib/utils/badge-utils', () => ({
