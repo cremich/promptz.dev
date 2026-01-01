@@ -2,12 +2,12 @@ import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getFormattedDisplayDate } from "@/lib/formatter/date"
 import { idToSlug } from "@/lib/formatter/slug"
 import { ContentTypeBadge } from "@/components/content-type-badge"
 import { LibraryBadge } from "@/components/library-badge"
 import { BadgeContainer } from "@/components/badge-container"
 import { GitHash } from "@/components/git-hash"
+import { ContentDate } from "@/components/content-date"
 import { cn } from "@/lib/utils"
 import type { Power } from "@/lib/types/content"
 
@@ -19,7 +19,6 @@ interface PowerCardProps {
 export function PowerCard({ power, className }: PowerCardProps) {
   // Use git information if available, otherwise fall back to frontmatter
   const displayAuthor = power.git?.author || power.author
-  const formattedDate = getFormattedDisplayDate(power.git?.createdDate, power.date)
   
   // Generate SEO-friendly slug for the detail page
   const powerSlug = idToSlug(power.id)
@@ -72,7 +71,7 @@ export function PowerCard({ power, className }: PowerCardProps) {
         </CardContent>
 
         <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{formattedDate}</span>
+          <ContentDate content={power} />
           <GitHash git={power.git} />
         </CardFooter>
       </Card>

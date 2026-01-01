@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { GitHubLink } from "@/components/github-link";
-import { getFormattedDisplayDate } from "@/lib/formatter/date";
+import { ContentDate } from "@/components/content-date";
 import type { ContentItem } from "@/lib/types/content";
 
 interface ContributorInfoProps {
@@ -14,10 +14,6 @@ function getShortHash(fullHash: string): string {
 
 export function ContributorInfo({ content }: ContributorInfoProps) {
   const displayAuthor = content.git?.author || content.author;
-  const createdDate = getFormattedDisplayDate(content.git?.createdDate, content.date);
-  const lastModifiedDate = content.git?.lastModifiedDate 
-    ? getFormattedDisplayDate(content.git.lastModifiedDate, null)
-    : null;
 
   return (
     <Card className="mb-8">
@@ -35,13 +31,22 @@ export function ContributorInfo({ content }: ContributorInfoProps) {
           
           <div>
             <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-1">Created</h3>
-            <p className="text-sm">{createdDate}</p>
+            <ContentDate 
+              content={content} 
+              variant="detail" 
+            />
           </div>
           
-          {lastModifiedDate && (
+          {content.git?.lastModifiedDate && (
             <div>
               <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-1">Last Modified</h3>
-              <p className="text-sm">{lastModifiedDate}</p>
+              <ContentDate 
+                content={{ 
+                  ...content, 
+                  git: { ...content.git, createdDate: content.git.lastModifiedDate } 
+                }} 
+                variant="detail" 
+              />
             </div>
           )}
           

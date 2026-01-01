@@ -1,12 +1,12 @@
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getFormattedDisplayDate } from "@/lib/formatter/date"
 import { idToSlug } from "@/lib/formatter/slug"
 import { ContentTypeBadge } from "@/components/content-type-badge"
 import { LibraryBadge } from "@/components/library-badge"
 import { BadgeContainer } from "@/components/badge-container"
 import { GitHash } from "@/components/git-hash"
+import { ContentDate } from "@/components/content-date"
 import { cn } from "@/lib/utils"
 import type { SteeringDocument } from "@/lib/types/content"
 
@@ -18,7 +18,6 @@ interface SteeringCardProps {
 export function SteeringCard({ steering, className }: SteeringCardProps) {
   // Use git information if available, otherwise fall back to frontmatter
   const displayAuthor = steering.git?.author || steering.author
-  const formattedDate = getFormattedDisplayDate(steering.git?.createdDate, steering.date)
 
   return (
     <Link href={`/steering/${idToSlug(steering.id)}`} className="block">
@@ -47,7 +46,7 @@ export function SteeringCard({ steering, className }: SteeringCardProps) {
         </CardContent>
 
         <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{formattedDate}</span>
+          <ContentDate content={steering} />
           <GitHash git={steering.git} />
         </CardFooter>
       </Card>

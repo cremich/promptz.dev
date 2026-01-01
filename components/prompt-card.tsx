@@ -1,12 +1,12 @@
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getFormattedDisplayDate } from "@/lib/formatter/date"
 import { idToSlug } from "@/lib/formatter/slug"
 import { ContentTypeBadge } from "@/components/content-type-badge"
 import { LibraryBadge } from "@/components/library-badge"
 import { BadgeContainer } from "@/components/badge-container"
 import { GitHash } from "@/components/git-hash"
+import { ContentDate } from "@/components/content-date"
 import { cn } from "@/lib/utils"
 import type { Prompt } from "@/lib/types/content"
 
@@ -18,7 +18,6 @@ interface PromptCardProps {
 export function PromptCard({ prompt, className }: PromptCardProps) {
   // Use git information if available, otherwise fall back to frontmatter
   const displayAuthor = prompt.git?.author || prompt.author
-  const formattedDate = getFormattedDisplayDate(prompt.git?.createdDate, prompt.date)
 
   return (
     <Link href={`/prompts/${idToSlug(prompt.id)}`} className="block">
@@ -47,7 +46,7 @@ export function PromptCard({ prompt, className }: PromptCardProps) {
         </CardContent>
 
         <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{formattedDate}</span>
+          <ContentDate content={prompt} />
           <GitHash git={prompt.git} />
         </CardFooter>
       </Card>

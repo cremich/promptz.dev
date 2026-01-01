@@ -1,12 +1,12 @@
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getFormattedDisplayDate } from "@/lib/formatter/date"
 import { idToSlug } from "@/lib/formatter/slug"
 import { ContentTypeBadge } from "@/components/content-type-badge"
 import { LibraryBadge } from "@/components/library-badge"
 import { BadgeContainer } from "@/components/badge-container"
 import { GitHash } from "@/components/git-hash"
+import { ContentDate } from "@/components/content-date"
 import { cn } from "@/lib/utils"
 import type { Agent } from "@/lib/types/content"
 
@@ -18,7 +18,6 @@ interface AgentCardProps {
 export function AgentCard({ agent, className }: AgentCardProps) {
   // Use git information if available, otherwise fall back to frontmatter
   const displayAuthor = agent.git?.author || agent.author
-  const formattedDate = getFormattedDisplayDate(agent.git?.createdDate, agent.date)
 
   return (
     <Link href={`/agents/${idToSlug(agent.id)}`} className="block">
@@ -50,7 +49,7 @@ export function AgentCard({ agent, className }: AgentCardProps) {
         </CardContent>
 
         <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{formattedDate}</span>
+          <ContentDate content={agent} />
           <GitHash git={agent.git} />
         </CardFooter>
       </Card>
