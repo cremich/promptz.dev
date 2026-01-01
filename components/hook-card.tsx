@@ -1,16 +1,12 @@
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getShortHash } from "@/lib/utils/git-extractor"
 import { getFormattedDisplayDate } from "@/lib/formatter/date"
 import { idToSlug } from "@/lib/formatter/slug"
-import { 
-  getContentTypeBadgeVariant, 
-  getLibraryBadgeVariant, 
-  getLibraryName,
-  getBadgeArrangement
-} from "@/lib/utils/badge-utils"
+import { ContentTypeBadge } from "@/components/content-type-badge"
+import { LibraryBadge } from "@/components/library-badge"
+import { BadgeContainer } from "@/components/badge-container"
 import { cn } from "@/lib/utils"
 import type { Hook } from "@/lib/types/content"
 
@@ -20,13 +16,6 @@ interface HookCardProps {
 }
 
 export function HookCard({ hook, className }: HookCardProps) {
-  const libraryName = getLibraryName(hook.path)
-  
-  // Get badge configurations
-  const contentTypeBadge = getContentTypeBadgeVariant('hook')
-  const libraryBadge = getLibraryBadgeVariant(libraryName)
-  const badgeArrangement = getBadgeArrangement('card-header')
-  
   // Use git information if available, otherwise fall back to frontmatter
   const displayAuthor = hook.git?.author || hook.author
   const formattedDate = getFormattedDisplayDate(hook.git?.createdDate, hook.date)
@@ -39,26 +28,10 @@ export function HookCard({ hook, className }: HookCardProps) {
             <CardTitle className="text-lg font-semibold leading-tight">
               {hook.title}
             </CardTitle>
-            <div className={badgeArrangement.containerClasses}>
-              <Badge 
-                variant={contentTypeBadge.variant}
-                className={cn(
-                  badgeArrangement.badgeClasses,
-                  contentTypeBadge.className
-                )}
-              >
-                hook
-              </Badge>
-              <Badge 
-                variant={libraryBadge.variant}
-                className={cn(
-                  badgeArrangement.badgeClasses,
-                  libraryBadge.className
-                )}
-              >
-                {libraryName}
-              </Badge>
-            </div>
+            <BadgeContainer context="card-header">
+              <ContentTypeBadge contentType="hook" />
+              <LibraryBadge content={hook} />
+            </BadgeContainer>
           </div>
         </CardHeader>
         

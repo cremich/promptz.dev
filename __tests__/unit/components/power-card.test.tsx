@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { PowerCard, PowerCardSkeleton } from '@/components/power-card'
 import type { Power } from '@/lib/types/content'
+import { idToSlug } from '@/lib/formatter/slug'
 
 // Mock Next.js Link component
 jest.mock('next/link', () => {
@@ -15,12 +16,12 @@ jest.mock('@/lib/utils/git-extractor', () => ({
 }))
 
 // Mock the date formatter functions
-jest.mock('@/lib/utils/date-formatter', () => ({
+jest.mock('@/lib/formatter/date', () => ({
   getFormattedDisplayDate: jest.fn(() => 'Jan 15, 2024')
 }))
 
 // Mock the slug utilities
-jest.mock('@/lib/utils/slug-utils', () => ({
+jest.mock('@/lib/formatter/slug', () => ({
   idToSlug: jest.fn((id: string) => {
     // Convert "kiro-powers/powers/stripe" to "kiro-powers-power-stripe"
     const parts = id.split('/')
@@ -29,28 +30,6 @@ jest.mock('@/lib/utils/slug-utils', () => ({
     const singularType = type.endsWith('s') ? type.slice(0, -1) : type
     return `${library}-${singularType}-${name}`
   })
-}))
-
-// Import the mocked function for testing
-import { idToSlug } from '@/lib/formatter/slug'
-
-// Mock the badge utility functions
-jest.mock('@/lib/utils/badge-utils', () => ({
-  getContentTypeBadgeVariant: jest.fn(() => ({ variant: 'default' })),
-  getLibraryBadgeVariant: jest.fn(() => ({ variant: 'outline' })),
-  getLibraryName: jest.fn((path: string) => {
-    const pathParts = path.split('/')
-    const librariesIndex = pathParts.indexOf('libraries')
-    if (librariesIndex !== -1 && librariesIndex + 1 < pathParts.length) {
-      return pathParts[librariesIndex + 1]
-    }
-    return 'unknown'
-  }),
-  getBadgeArrangement: jest.fn(() => ({
-    containerClasses: 'flex flex-wrap gap-1 shrink-0',
-    badgeClasses: 'text-xs font-medium'
-  })),
-  getStandardBadgeClasses: jest.fn(() => 'text-xs font-medium')
 }))
 
 describe('PowerCard', () => {

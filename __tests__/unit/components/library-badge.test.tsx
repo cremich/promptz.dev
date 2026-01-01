@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { LibraryBadge } from '@/components/library-badge'
+import type { ContentItem } from '@/lib/types/content'
 
 // Mock the Badge component
 jest.mock('@/components/ui/badge', () => ({
@@ -15,9 +16,28 @@ jest.mock('@/lib/utils', () => ({
   cn: (...classes: string[]) => classes.filter(Boolean).join(' ')
 }))
 
+// Mock the getLibraryName function
+jest.mock('@/lib/library', () => ({
+  getLibraryName: jest.fn((path: string) => {
+    if (path.includes('promptz')) return 'promptz'
+    if (path.includes('kiro-powers')) return 'kiro-powers'
+    return 'unknown-lib'
+  })
+}))
+
 describe('LibraryBadge', () => {
+  const createMockContent = (path: string): ContentItem => ({
+    id: 'test-id',
+    title: 'Test Content',
+    author: 'Test Author',
+    date: '2024-01-01',
+    path,
+    type: 'prompt'
+  } as ContentItem)
+
   it('should render promptz library with blue styling', () => {
-    render(<LibraryBadge libraryName="promptz" />)
+    const content = createMockContent('libraries/promptz/prompts/test-prompt')
+    render(<LibraryBadge content={content} />)
     
     const badge = screen.getByTestId('badge')
     expect(badge).toHaveTextContent('promptz')
@@ -26,7 +46,8 @@ describe('LibraryBadge', () => {
   })
 
   it('should render kiro-powers library with purple styling', () => {
-    render(<LibraryBadge libraryName="kiro-powers" />)
+    const content = createMockContent('libraries/kiro-powers/powers/test-power')
+    render(<LibraryBadge content={content} />)
     
     const badge = screen.getByTestId('badge')
     expect(badge).toHaveTextContent('kiro-powers')
@@ -35,7 +56,8 @@ describe('LibraryBadge', () => {
   })
 
   it('should render unknown library with default styling', () => {
-    render(<LibraryBadge libraryName="unknown-lib" />)
+    const content = createMockContent('some/unknown/path')
+    render(<LibraryBadge content={content} />)
     
     const badge = screen.getByTestId('badge')
     expect(badge).toHaveTextContent('unknown-lib')
@@ -44,14 +66,20 @@ describe('LibraryBadge', () => {
   })
 
   it('should be case insensitive for library names', () => {
-    render(<LibraryBadge libraryName="PROMPTZ" />)
+    const content = createMockContent('libraries/PROMPTZ/prompts/test-prompt')
+    // Mock getLibraryName to return uppercase
+    const mockGetLibraryName = jest.requireMock('@/lib/library').getLibraryName
+    mockGetLibraryName.mockReturnValueOnce('PROMPTZ')
+    
+    render(<LibraryBadge content={content} />)
     
     const badge = screen.getByTestId('badge')
     expect(badge).toHaveClass('border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300')
   })
 
   it('should apply custom className', () => {
-    render(<LibraryBadge libraryName="promptz" className="custom-class" />)
+    const content = createMockContent('libraries/promptz/prompts/test-prompt')
+    render(<LibraryBadge content={content} className="custom-class" />)
     
     const badge = screen.getByTestId('badge')
     expect(badge).toHaveClass('text-xs border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300 custom-class')

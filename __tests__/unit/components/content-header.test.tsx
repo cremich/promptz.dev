@@ -10,8 +10,8 @@ jest.mock('@/components/content-type-badge', () => ({
 }))
 
 jest.mock('@/components/library-badge', () => ({
-  LibraryBadge: ({ libraryName }: { libraryName: string }) => (
-    <span data-testid="library-badge">{libraryName}</span>
+  LibraryBadge: ({ content }: { content: { path: string } }) => (
+    <span data-testid="library-badge">{content.path.includes('test-lib') ? 'test-lib' : 'unknown'}</span>
   )
 }))
 

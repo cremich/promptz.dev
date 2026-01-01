@@ -1,36 +1,54 @@
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import type { ContentItem } from "@/lib/types/content";
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
+import type { VariantProps } from "class-variance-authority"
+import type { badgeVariants } from "@/components/ui/badge"
+
+type BadgeVariant = VariantProps<typeof badgeVariants>["variant"]
 
 interface ContentTypeBadgeProps {
-  contentType: ContentItem['type'];
-  className?: string;
+  contentType: string
+  className?: string
 }
 
-export function ContentTypeBadge({ contentType, className }: ContentTypeBadgeProps) {
-  const getVariant = (type: ContentItem['type']) => {
-    switch (type) {
-      case 'prompt':
-        return 'secondary';
-      case 'agent':
-        return 'default';
-      case 'power':
-        return 'default';
-      case 'hook':
-        return 'outline';
-      case 'steering':
-        return 'outline';
-      default:
-        return 'secondary';
-    }
-  };
+/**
+ * Get the appropriate badge variant for content type badges
+ */
+function getContentTypeBadgeVariant(contentType: string): {
+  variant: BadgeVariant
+  className?: string
+} {
+  switch (contentType.toLowerCase()) {
+    case 'prompt':
+      return { variant: 'secondary' }
+    case 'agent':
+      return { variant: 'default' }
+    case 'power':
+      return { variant: 'default' }
+    case 'hook':
+      return { variant: 'outline' }
+    case 'steering':
+      return { variant: 'outline' }
+    default:
+      return { variant: 'secondary' }
+  }
+}
 
+/**
+ * ContentTypeBadge component for displaying content type badges with consistent styling
+ */
+export function ContentTypeBadge({ contentType, className }: ContentTypeBadgeProps) {
+  const badgeConfig = getContentTypeBadgeVariant(contentType)
+  
   return (
     <Badge 
-      variant={getVariant(contentType)}
-      className={cn("text-xs", className)}
+      variant={badgeConfig.variant}
+      className={cn(
+        "text-xs font-medium",
+        badgeConfig.className,
+        className
+      )}
     >
-      {contentType}
+      {contentType.toLowerCase()}
     </Badge>
-  );
+  )
 }

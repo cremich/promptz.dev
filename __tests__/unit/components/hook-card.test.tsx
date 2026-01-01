@@ -7,20 +7,10 @@ jest.mock('@/lib/utils/git-extractor', () => ({
   getShortHash: jest.fn((hash: string) => hash.substring(0, 7))
 }))
 
-jest.mock('@/lib/utils/date-formatter', () => ({
+jest.mock('@/lib/formatter/date', () => ({
   getFormattedDisplayDate: jest.fn((gitDate?: string, fallbackDate?: string) => {
     return gitDate || fallbackDate || 'Unknown Date'
   })
-}))
-
-jest.mock('@/lib/utils/badge-utils', () => ({
-  getContentTypeBadgeVariant: jest.fn(() => ({ variant: 'outline' })),
-  getLibraryBadgeVariant: jest.fn(() => ({ variant: 'outline', className: 'test-library-badge' })),
-  getLibraryName: jest.fn(() => 'promptz'),
-  getBadgeArrangement: jest.fn(() => ({
-    containerClasses: 'flex flex-wrap gap-1 shrink-0',
-    badgeClasses: 'text-xs font-medium'
-  }))
 }))
 
 const mockHook: Hook = {

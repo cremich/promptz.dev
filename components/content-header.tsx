@@ -1,15 +1,12 @@
 import { ContentTypeBadge } from "@/components/content-type-badge";
 import { LibraryBadge } from "@/components/library-badge";
 import type { ContentItem } from "@/lib/types/content";
-import { getLibraryName } from "@/lib/library";
 
 interface ContentHeaderProps {
   content: ContentItem;
 }
 
 export function ContentHeader({ content }: ContentHeaderProps) {
-  const extractedLibraryName = getLibraryName(content.path);
-
   return (
     <div className="mb-8">
       <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
@@ -18,7 +15,7 @@ export function ContentHeader({ content }: ContentHeaderProps) {
         </h1>
         <div className="flex flex-wrap gap-2 shrink-0">
           <ContentTypeBadge contentType={content.type} />
-          <LibraryBadge libraryName={extractedLibraryName} />
+          <LibraryBadge content={content} />
         </div>
       </div>
       

@@ -8,12 +8,10 @@ import { getSteeringById, getAllSteering } from "@/lib/steering";
 import { getFormattedDisplayDate } from "@/lib/formatter/date";
 import { getShortHash } from "@/lib/utils/git-extractor";
 import { idToSlug, slugToId, isValidSlug } from "@/lib/formatter/slug";
-import { 
-  getContentTypeBadgeVariant, 
-  getLibraryBadgeVariant, 
-  getLibraryName 
-} from "@/lib/utils/badge-utils";
-import { cn } from "@/lib/utils";
+import { getLibraryName } from "@/lib/library";
+import { ContentTypeBadge } from "@/components/content-type-badge";
+import { LibraryBadge } from "@/components/library-badge";
+import { BadgeContainer } from "@/components/badge-container";
 import type { SteeringDocument } from "@/lib/types/content";
 
 interface SteeringDetailPageProps {
@@ -118,9 +116,6 @@ async function SteeringDetail({ slug }: { slug: string }) {
     notFound();
   }
 
-  const libraryName = getLibraryName(steering.path);
-  const contentTypeBadge = getContentTypeBadgeVariant('steering');
-  const libraryBadge = getLibraryBadgeVariant(libraryName);
   const githubUrl = getGitHubUrl(steering);
   
   // Use git information if available, otherwise fall back to frontmatter
@@ -139,25 +134,15 @@ async function SteeringDetail({ slug }: { slug: string }) {
             <h1 className="text-3xl font-bold leading-tight tracking-tight text-black dark:text-zinc-50">
               {steering.title}
             </h1>
-            <div className="flex flex-wrap gap-2 shrink-0">
-              <Badge 
-                variant={contentTypeBadge.variant}
-                className={cn("text-xs", contentTypeBadge.className)}
-              >
-                steering
-              </Badge>
-              <Badge 
-                variant={libraryBadge.variant}
-                className={cn("text-xs", libraryBadge.className)}
-              >
-                {libraryName}
-              </Badge>
+            <BadgeContainer context="default" className="shrink-0">
+              <ContentTypeBadge contentType="steering" />
+              <LibraryBadge content={steering} />
               {steering.category && (
                 <Badge variant="outline" className="text-xs">
                   {steering.category}
                 </Badge>
               )}
-            </div>
+            </BadgeContainer>
           </div>
           
           <p className="text-lg text-zinc-600 dark:text-zinc-400 mb-4">

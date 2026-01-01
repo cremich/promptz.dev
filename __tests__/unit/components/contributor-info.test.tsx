@@ -3,7 +3,7 @@ import { ContributorInfo } from '@/components/contributor-info'
 import type { Agent, ContentItem } from '@/lib/types/content'
 
 // Mock the date formatter
-jest.mock('@/lib/utils/date-formatter', () => ({
+jest.mock('@/lib/formatter/date', () => ({
   getFormattedDisplayDate: jest.fn((gitDate: string | undefined, fallbackDate: string | null) => {
     if (gitDate) return `Formatted: ${gitDate}`
     if (fallbackDate) return `Formatted: ${fallbackDate}`

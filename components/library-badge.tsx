@@ -1,29 +1,57 @@
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
+import { getLibraryName } from "@/lib/library"
+import type { VariantProps } from "class-variance-authority"
+import type { badgeVariants } from "@/components/ui/badge"
+import type { ContentItem } from "@/lib/types/content"
+
+type BadgeVariant = VariantProps<typeof badgeVariants>["variant"]
 
 interface LibraryBadgeProps {
-  libraryName: string;
-  className?: string;
+  content: ContentItem
+  className?: string
 }
 
-export function LibraryBadge({ libraryName, className }: LibraryBadgeProps) {
-  const getLibraryStyles = (name: string) => {
-    switch (name.toLowerCase()) {
-      case 'promptz':
-        return 'border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300';
-      case 'kiro-powers':
-        return 'border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300';
-      default:
-        return '';
-    }
-  };
+/**
+ * Get the appropriate badge variant and styling for library source badges
+ */
+function getLibraryBadgeVariant(libraryName: string): {
+  variant: BadgeVariant
+  className?: string
+} {
+  switch (libraryName.toLowerCase()) {
+    case 'promptz':
+      return { 
+        variant: 'outline',
+        className: 'border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300'
+      }
+    case 'kiro-powers':
+      return { 
+        variant: 'outline',
+        className: 'border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300'
+      }
+    default:
+      return { variant: 'outline' }
+  }
+}
 
+/**
+ * LibraryBadge component for displaying library source badges with consistent styling
+ */
+export function LibraryBadge({ content, className }: LibraryBadgeProps) {
+  const libraryName = getLibraryName(content.path)
+  const badgeConfig = getLibraryBadgeVariant(libraryName)
+  
   return (
     <Badge 
-      variant="outline"
-      className={cn("text-xs", getLibraryStyles(libraryName), className)}
+      variant={badgeConfig.variant}
+      className={cn(
+        "text-xs font-medium",
+        badgeConfig.className,
+        className
+      )}
     >
       {libraryName}
     </Badge>
-  );
+  )
 }

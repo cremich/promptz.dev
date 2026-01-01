@@ -5,12 +5,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { getShortHash } from "@/lib/utils/git-extractor"
 import { getFormattedDisplayDate } from "@/lib/formatter/date"
 import { idToSlug } from "@/lib/formatter/slug"
-import { 
-  getContentTypeBadgeVariant, 
-  getLibraryBadgeVariant, 
-  getLibraryName,
-  getBadgeArrangement
-} from "@/lib/utils/badge-utils"
+import { ContentTypeBadge } from "@/components/content-type-badge"
+import { LibraryBadge } from "@/components/library-badge"
+import { BadgeContainer } from "@/components/badge-container"
 import { cn } from "@/lib/utils"
 import type { Power } from "@/lib/types/content"
 
@@ -20,13 +17,6 @@ interface PowerCardProps {
 }
 
 export function PowerCard({ power, className }: PowerCardProps) {
-  const libraryName = getLibraryName(power.path)
-  
-  // Get badge configurations
-  const contentTypeBadge = getContentTypeBadgeVariant('power')
-  const libraryBadge = getLibraryBadgeVariant(libraryName)
-  const badgeArrangement = getBadgeArrangement('card-header')
-  
   // Use git information if available, otherwise fall back to frontmatter
   const displayAuthor = power.git?.author || power.author
   const formattedDate = getFormattedDisplayDate(power.git?.createdDate, power.date)
@@ -42,26 +32,10 @@ export function PowerCard({ power, className }: PowerCardProps) {
             <CardTitle className="text-lg font-semibold leading-tight">
               {power.displayName || power.title}
             </CardTitle>
-            <div className={badgeArrangement.containerClasses}>
-              <Badge 
-                variant={contentTypeBadge.variant}
-                className={cn(
-                  badgeArrangement.badgeClasses,
-                  contentTypeBadge.className
-                )}
-              >
-                power
-              </Badge>
-              <Badge 
-                variant={libraryBadge.variant}
-                className={cn(
-                  badgeArrangement.badgeClasses,
-                  libraryBadge.className
-                )}
-              >
-                {libraryName}
-              </Badge>
-            </div>
+            <BadgeContainer context="card-header">
+              <ContentTypeBadge contentType="power" />
+              <LibraryBadge content={power} />
+            </BadgeContainer>
           </div>
         </CardHeader>
         

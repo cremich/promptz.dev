@@ -8,27 +8,8 @@ jest.mock('@/lib/utils/git-extractor', () => ({
 }))
 
 // Mock the date formatter functions
-jest.mock('@/lib/utils/date-formatter', () => ({
+jest.mock('@/lib/formatter/date', () => ({
   getFormattedDisplayDate: jest.fn(() => 'Jan 15, 2024')
-}))
-
-// Mock the badge utility functions
-jest.mock('@/lib/utils/badge-utils', () => ({
-  getContentTypeBadgeVariant: jest.fn(() => ({ variant: 'secondary' })),
-  getLibraryBadgeVariant: jest.fn(() => ({ variant: 'outline' })),
-  getLibraryName: jest.fn((path: string) => {
-    const pathParts = path.split('/')
-    const librariesIndex = pathParts.indexOf('libraries')
-    if (librariesIndex !== -1 && librariesIndex + 1 < pathParts.length) {
-      return pathParts[librariesIndex + 1]
-    }
-    return 'unknown'
-  }),
-  getBadgeArrangement: jest.fn(() => ({
-    containerClasses: 'flex flex-wrap gap-1 shrink-0',
-    badgeClasses: 'text-xs font-medium'
-  })),
-  getStandardBadgeClasses: jest.fn(() => 'text-xs font-medium')
 }))
 
 describe('PromptCard', () => {

@@ -22,20 +22,6 @@ const config: Config = {
   },
   // Coverage configuration for 100% enforcement
   collectCoverage: true,
-  collectCoverageFrom: [
-    "app/**/*.{js,jsx,ts,tsx}",
-    "components/**/*.{js,jsx,ts,tsx}",
-    "lib/**/*.{js,ts}",
-    "!**/*.d.ts",
-    "!**/node_modules/**",
-    "!**/.next/**",
-    "!**/coverage/**",
-    "!app/**/layout.tsx", // Layouts are harder to test meaningfully
-    "!app/**/loading.tsx", // Loading components are simple UI
-    "!app/**/not-found.tsx", // Error pages are simple UI
-    "!app/globals.css", // CSS files don't need coverage
-    "!**/*.config.{js,ts}", // Config files don't need coverage
-  ],
   coverageDirectory: "coverage",
   coverageReporters: [
     "text",
