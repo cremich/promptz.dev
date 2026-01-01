@@ -35,3 +35,8 @@ npm run lint
 # Run regression tests
 npm run test
 ```
+
+```bash
+# Run regression tests with coverage
+npm run test:coverage
+```
