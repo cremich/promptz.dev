@@ -1,6 +1,6 @@
 import 'server-only'
 import { cache } from 'react'
-import { compareDatesNewestFirst } from './utils/date-formatter'
+import { compareDatesNewestFirst } from './formatter/date'
 import type { Prompt } from './types/content'
 
 // Import static JSON data generated at build time

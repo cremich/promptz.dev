@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { GitHubLink } from "@/components/github-link";
-import { getFormattedDisplayDate } from "@/lib/utils/date-formatter";
+import { getFormattedDisplayDate } from "@/lib/formatter/date";
 import type { ContentItem } from "@/lib/types/content";
 
 interface ContributorInfoProps {

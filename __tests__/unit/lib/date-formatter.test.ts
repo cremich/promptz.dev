@@ -1,12 +1,8 @@
 import {
   formatDate,
-  formatGitDate,
-  formatFrontmatterDate,
   getFormattedDisplayDate,
-  getDateTimestamp,
   compareDatesNewestFirst,
-  isValidDate
-} from '@/lib/utils/date-formatter'
+} from '@/lib/formatter/date'
 
 describe('date-formatter', () => {
   describe('formatDate', () => {
@@ -42,30 +38,6 @@ describe('date-formatter', () => {
     })
   })
 
-  describe('formatGitDate', () => {
-    it('should format git date strings', () => {
-      const result = formatGitDate('2024-01-15T10:00:00Z')
-      expect(result).toBe('Jan 15, 2024')
-    })
-
-    it('should handle null git dates', () => {
-      const result = formatGitDate(null)
-      expect(result).toBe('Unknown Date')
-    })
-  })
-
-  describe('formatFrontmatterDate', () => {
-    it('should format frontmatter date strings', () => {
-      const result = formatFrontmatterDate('2024-01-15')
-      expect(result).toBe('Jan 15, 2024')
-    })
-
-    it('should handle null frontmatter dates', () => {
-      const result = formatFrontmatterDate(null)
-      expect(result).toBe('Unknown Date')
-    })
-  })
-
   describe('getFormattedDisplayDate', () => {
     it('should prefer git creation date over frontmatter date', () => {
       const result = getFormattedDisplayDate('2024-01-15T10:00:00Z', '2024-01-10')
@@ -80,20 +52,6 @@ describe('date-formatter', () => {
     it('should return Unknown Date when both dates are unavailable', () => {
       const result = getFormattedDisplayDate(null, null)
       expect(result).toBe('Unknown Date')
-    })
-  })
-
-  describe('getDateTimestamp', () => {
-    it('should return timestamp for valid dates', () => {
-      const result = getDateTimestamp('2024-01-15T10:00:00Z')
-      expect(result).toBeGreaterThan(0)
-      expect(typeof result).toBe('number')
-    })
-
-    it('should return 0 for invalid dates', () => {
-      expect(getDateTimestamp(null)).toBe(0)
-      expect(getDateTimestamp('invalid-date')).toBe(0)
-      expect(getDateTimestamp('')).toBe(0)
     })
   })
 
@@ -119,20 +77,6 @@ describe('date-formatter', () => {
       expect(compareDatesNewestFirst(validDate, null)).toBeLessThan(0)
       expect(compareDatesNewestFirst(null, validDate)).toBeGreaterThan(0)
       expect(compareDatesNewestFirst(null, null)).toBe(0)
-    })
-  })
-
-  describe('isValidDate', () => {
-    it('should return true for valid dates', () => {
-      expect(isValidDate('2024-01-15T10:00:00Z')).toBe(true)
-      expect(isValidDate('2024-01-15')).toBe(true)
-    })
-
-    it('should return false for invalid dates', () => {
-      expect(isValidDate(null)).toBe(false)
-      expect(isValidDate(undefined)).toBe(false)
-      expect(isValidDate('')).toBe(false)
-      expect(isValidDate('invalid-date')).toBe(false)
     })
   })
 })

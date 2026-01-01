@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getShortHash } from "@/lib/utils/git-extractor"
-import { getFormattedDisplayDate } from "@/lib/utils/date-formatter"
+import { getFormattedDisplayDate } from "@/lib/formatter/date"
 import { idToSlug } from "@/lib/utils/slug-utils"
 import { 
   getContentTypeBadgeVariant, 

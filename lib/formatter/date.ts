@@ -46,28 +46,6 @@ export function formatDate(
 }
 
 /**
- * Format a git date specifically (wrapper for consistency)
- * Git dates are typically ISO strings from git log
- * 
- * @param gitDate - Date string from git history
- * @returns Formatted date string
- */
-export function formatGitDate(gitDate: string | undefined | null): string {
-  return formatDate(gitDate)
-}
-
-/**
- * Format a frontmatter date specifically (wrapper for consistency)
- * Frontmatter dates can be in various formats depending on the author
- * 
- * @param frontmatterDate - Date string from YAML frontmatter
- * @returns Formatted date string
- */
-export function formatFrontmatterDate(frontmatterDate: string | undefined | null): string {
-  return formatDate(frontmatterDate)
-}
-
-/**
  * Get the most appropriate date from git info or frontmatter with consistent formatting
  * Prioritizes git creation date, falls back to frontmatter date
  * 
@@ -81,12 +59,12 @@ export function getFormattedDisplayDate(
 ): string {
   // Prefer git creation date if available
   if (gitCreatedDate) {
-    return formatGitDate(gitCreatedDate)
+    return formatDate(gitCreatedDate)
   }
   
   // Fall back to frontmatter date
   if (frontmatterDate) {
-    return formatFrontmatterDate(frontmatterDate)
+    return formatDate(frontmatterDate)
   }
   
   // Final fallback
@@ -99,8 +77,9 @@ export function getFormattedDisplayDate(
  * 
  * @param dateInput - Date string from any source
  * @returns Timestamp number for sorting, or 0 for invalid dates
+ * 
  */
-export function getDateTimestamp(dateInput: string | undefined | null): number {
+function getDateTimestamp(dateInput: string | undefined | null): number {
   if (!dateInput || typeof dateInput !== 'string' || dateInput.trim() === '') {
     return 0
   }
@@ -130,24 +109,5 @@ export function compareDatesNewestFirst(
   
   // Newest first (descending order)
   return timestampB - timestampA
-}
 
-/**
- * Validate if a date string is parseable
- * Useful for validation before display
- * 
- * @param dateInput - Date string to validate
- * @returns True if the date can be parsed successfully
- */
-export function isValidDate(dateInput: string | undefined | null): boolean {
-  if (!dateInput || typeof dateInput !== 'string' || dateInput.trim() === '') {
-    return false
-  }
-
-  try {
-    const date = new Date(dateInput)
-    return !isNaN(date.getTime())
-  } catch {
-    return false
-  }
 }

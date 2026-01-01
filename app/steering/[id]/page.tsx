@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getSteeringById, getAllSteering } from "@/lib/steering";
-import { getFormattedDisplayDate } from "@/lib/utils/date-formatter";
+import { getFormattedDisplayDate } from "@/lib/formatter/date";
 import { getShortHash } from "@/lib/utils/git-extractor";
 import { idToSlug, slugToId, isValidSlug } from "@/lib/utils/slug-utils";
 import { 

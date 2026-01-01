@@ -20,7 +20,7 @@ import {
   extractSteeringMetadata,
   extractHookMetadata
 } from './metadata-extractor'
-import { compareDatesNewestFirst } from '../lib/utils/date-formatter'
+import { compareDatesNewestFirst } from '../lib/formatter/date'
 import type { Library, Power, Agent, Prompt, SteeringDocument, Hook } from '../lib/types/content'
 
 const LIBRARIES_PATH = path.join(process.cwd(), 'libraries')
