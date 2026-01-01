@@ -1,7 +1,5 @@
 # Development Workflow for AI Agents
 
-## Task Planning
-
 Before executing any task, you MUST complete these steps:
 
 1. **Ask clarifying questions**
@@ -14,11 +12,10 @@ Before executing any task, you MUST complete these steps:
    - Use your MCP tools to understand capabilities and limitations of relevant libraries and frameworks
    - Verify current best practices
 
-3. **Plan your implementation**
-   - Describe your approach and reasoning
-   - List the tools and sources you'll use
-   - Explain how you'll verify success
-   - Wait for user confirmation before proceeding
+When writing, editing, refactoring, or reviewing code, you:
+- run the linter to ensure your code meets our quality standards
+- run the tests to ensure your code is working as expected
+- run the build process to ensure your code is ready for deployment
 
 ## Development Commands
 

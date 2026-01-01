@@ -15,8 +15,47 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "app/test-content/**"
+    "app/test-content/**",
   ]),
+
+  {
+    rules: {
+      // Code complexity limits
+      "max-lines": [
+        "error",
+        { max: 400, skipBlankLines: true, skipComments: true },
+      ],
+      "max-depth": ["error", 3],
+      complexity: ["error", 12],
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["*/utils/*", "*/utils"],
+              message: "No utils folders. Use domain-specific names.",
+            },
+            {
+              group: ["*/helpers/*", "*/helpers"],
+              message: "No helpers folders. Use domain-specific names.",
+            },
+            {
+              group: ["*/common/*", "*/common"],
+              message: "No common folders. Use domain-specific names.",
+            },
+            {
+              group: ["*/shared/*", "*/shared"],
+              message: "No shared folders. Use domain-specific names.",
+            },
+            {
+              group: ["*/core/*", "*/core"],
+              message: "No core folders. Use domain-specific names.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;
