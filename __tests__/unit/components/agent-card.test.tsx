@@ -3,7 +3,7 @@ import { AgentCard, AgentCardSkeleton } from '@/components/agent-card'
 import type { Agent } from '@/lib/types/content'
 
 // Mock the utility functions
-jest.mock('@/lib/utils/git-extractor', () => ({
+jest.mock('@/lib/formatter/git', () => ({
   getShortHash: jest.fn((hash: string) => hash.substring(0, 7))
 }))
 

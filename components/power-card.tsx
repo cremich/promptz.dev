@@ -2,12 +2,12 @@ import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getShortHash } from "@/lib/utils/git-extractor"
 import { getFormattedDisplayDate } from "@/lib/formatter/date"
 import { idToSlug } from "@/lib/formatter/slug"
 import { ContentTypeBadge } from "@/components/content-type-badge"
 import { LibraryBadge } from "@/components/library-badge"
 import { BadgeContainer } from "@/components/badge-container"
+import { GitHash } from "@/components/git-hash"
 import { cn } from "@/lib/utils"
 import type { Power } from "@/lib/types/content"
 
@@ -73,11 +73,7 @@ export function PowerCard({ power, className }: PowerCardProps) {
 
         <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{formattedDate}</span>
-          {power.git?.commitHash && (
-            <span className="font-mono">
-              {getShortHash(power.git.commitHash)}
-            </span>
-          )}
+          <GitHash git={power.git} />
         </CardFooter>
       </Card>
     </Link>

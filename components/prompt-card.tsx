@@ -1,12 +1,12 @@
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getShortHash } from "@/lib/utils/git-extractor"
 import { getFormattedDisplayDate } from "@/lib/formatter/date"
 import { idToSlug } from "@/lib/formatter/slug"
 import { ContentTypeBadge } from "@/components/content-type-badge"
 import { LibraryBadge } from "@/components/library-badge"
 import { BadgeContainer } from "@/components/badge-container"
+import { GitHash } from "@/components/git-hash"
 import { cn } from "@/lib/utils"
 import type { Prompt } from "@/lib/types/content"
 
@@ -48,11 +48,7 @@ export function PromptCard({ prompt, className }: PromptCardProps) {
 
         <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{formattedDate}</span>
-          {prompt.git?.commitHash && (
-            <span className="font-mono">
-              {getShortHash(prompt.git.commitHash)}
-            </span>
-          )}
+          <GitHash git={prompt.git} />
         </CardFooter>
       </Card>
     </Link>
