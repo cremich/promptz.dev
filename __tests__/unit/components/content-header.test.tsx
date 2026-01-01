@@ -1,0 +1,67 @@
+import { render, screen } from '@testing-library/react'
+import { ContentHeader } from '@/components/content-header'
+import type { Agent, Prompt } from '@/lib/types/content'
+
+// Mock the badge components
+jest.mock('@/components/content-type-badge', () => ({
+  ContentTypeBadge: ({ contentType }: { contentType: string }) => (
+    <span data-testid="content-type-badge">{contentType}</span>
+  )
+}))
+
+jest.mock('@/components/library-badge', () => ({
+  LibraryBadge: ({ libraryName }: { libraryName: string }) => (
+    <span data-testid="library-badge">{libraryName}</span>
+  )
+}))
+
+describe('ContentHeader', () => {
+  const mockAgent: Agent = {
+    id: 'test-agent',
+    type: 'agent',
+    title: 'Test Agent',
+    author: 'Test Author',
+    date: '2024-01-01',
+    path: 'libraries/test-lib/agents/test-agent',
+    description: 'A test agent for testing purposes',
+    config: { mcpServers: ['test-server'] },
+    content: 'Test agent content'
+  }
+
+  const mockPrompt: Prompt = {
+    id: 'test-prompt',
+    type: 'prompt',
+    title: 'Test Prompt',
+    author: 'Test Author',
+    date: '2024-01-01',
+    path: 'libraries/test-lib/prompts/test-prompt',
+    content: 'Test prompt content'
+  }
+
+  it('should render content title and badges', () => {
+    render(<ContentHeader content={mockAgent} />)
+    
+    expect(screen.getByText('Test Agent')).toBeInTheDocument()
+    expect(screen.getByTestId('content-type-badge')).toHaveTextContent('agent')
+    expect(screen.getByTestId('library-badge')).toHaveTextContent('test-lib')
+  })
+
+  it('should render description when available', () => {
+    render(<ContentHeader content={mockAgent} />)
+    
+    expect(screen.getByText('A test agent for testing purposes')).toBeInTheDocument()
+  })
+
+  it('should not render description when not available', () => {
+    render(<ContentHeader content={mockPrompt} />)
+    
+    expect(screen.queryByText('A test agent for testing purposes')).not.toBeInTheDocument()
+  })
+
+  it('should render content ID', () => {
+    render(<ContentHeader content={mockAgent} />)
+    
+    expect(screen.getByText('ID:')).toBeInTheDocument()
+    expect(screen.getByText('test-agent')).toBeInTheDocument()
+  })
+})

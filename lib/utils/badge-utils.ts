@@ -1,5 +1,6 @@
 import type { VariantProps } from "class-variance-authority"
 import type { badgeVariants } from "@/components/ui/badge"
+import { getLibraryName } from "@/lib/library"
 
 type BadgeVariant = VariantProps<typeof badgeVariants>["variant"]
 
@@ -49,19 +50,6 @@ export function getLibraryBadgeVariant(libraryName: string): BadgeConfig {
     default:
       return { variant: 'outline' }
   }
-}
-
-/**
- * Extract library name from content path
- */
-export function getLibraryName(path: string): string {
-  const pathParts = path.split('/')
-  const librariesIndex = pathParts.indexOf('libraries')
-  if (librariesIndex !== -1 && librariesIndex + 1 < pathParts.length) {
-    const libraryName = pathParts[librariesIndex + 1]
-    return libraryName || 'unknown'
-  }
-  return 'unknown'
 }
 
 /**

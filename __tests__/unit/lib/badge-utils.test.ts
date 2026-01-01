@@ -1,7 +1,6 @@
 import {
   getContentTypeBadgeVariant,
   getLibraryBadgeVariant,
-  getLibraryName,
   getBadgeArrangement,
   getStandardBadgeClasses,
   getBadgeContainerClasses,
@@ -72,33 +71,6 @@ describe('Badge Utils', () => {
       const result = getLibraryBadgeVariant('PROMPTZ')
       expect(result.variant).toBe('outline')
       expect(result.className).toContain('border-blue-200')
-    })
-  })
-
-  describe('getLibraryName', () => {
-    it('should extract library name from promptz path', () => {
-      const result = getLibraryName('libraries/promptz/prompts/test.md')
-      expect(result).toBe('promptz')
-    })
-
-    it('should extract library name from kiro-powers path', () => {
-      const result = getLibraryName('libraries/kiro-powers/powers/test/POWER.md')
-      expect(result).toBe('kiro-powers')
-    })
-
-    it('should return unknown for paths without libraries directory', () => {
-      const result = getLibraryName('some/other/path/test.md')
-      expect(result).toBe('unknown')
-    })
-
-    it('should return unknown for incomplete library paths', () => {
-      const result = getLibraryName('libraries/')
-      expect(result).toBe('unknown')
-    })
-
-    it('should handle paths with libraries at different positions', () => {
-      const result = getLibraryName('root/libraries/custom-lib/content.md')
-      expect(result).toBe('custom-lib')
     })
   })
 
