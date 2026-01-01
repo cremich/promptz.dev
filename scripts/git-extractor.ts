@@ -101,6 +101,35 @@ async function findGitRoot(filePath: string): Promise<string | null> {
 }
 
 /**
+ * Check if a commit affects the given directory
+ */
+async function isCommitRelevantToDirectory(git: SimpleGit, commitHash: string, relativePath: string): Promise<boolean> {
+  try {
+    const files = await git.show([commitHash, '--name-only', '--format='])
+    const fileList = files.split('\n').filter(f => f.trim())
+    return fileList.some(file => file.startsWith(relativePath))
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Filter commits that affected the given directory
+ */
+async function getRelevantCommits(git: SimpleGit, log: LogResult, relativePath: string) {
+  const relevantCommits = []
+  
+  for (const commit of log.all) {
+    const isRelevant = await isCommitRelevantToDirectory(git, commit.hash, relativePath)
+    if (isRelevant) {
+      relevantCommits.push(commit)
+    }
+  }
+  
+  return relevantCommits
+}
+
+/**
  * Extract git information for a directory (useful for powers/agents)
  */
 export async function extractGitDirectoryInfo(dirPath: string): Promise<GitFileInfo | null> {
@@ -120,21 +149,7 @@ export async function extractGitDirectoryInfo(dirPath: string): Promise<GitFileI
     })
     
     // Filter commits that touched files in this directory
-    const relevantCommits = []
-    
-    for (const commit of log.all) {
-      try {
-        const files = await git.show([commit.hash, '--name-only', '--format='])
-        const fileList = files.split('\n').filter(f => f.trim())
-        
-        if (fileList.some(file => file.startsWith(relativePath))) {
-          relevantCommits.push(commit)
-        }
-      } catch {
-        // Skip commits we can't analyze
-        continue
-      }
-    }
+    const relevantCommits = await getRelevantCommits(git, log, relativePath)
     
     if (relevantCommits.length === 0) {
       return null
