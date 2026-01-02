@@ -31,6 +31,8 @@
 - **TypeScript Compiler**: Strict type checking with path mapping support (@/ alias)
 - **CSS Processing**: Tailwind CSS 4 compilation with PostCSS
 - **ESM Configuration**: Modern JavaScript modules with .mjs config files
+- **Build-time Data Generation**: Pre-build script (`scripts/generate-library-data.ts`) creates static JSON files
+- **TSX Execution**: TypeScript execution for build scripts with tsx package
 
 ## Testing Framework
 
@@ -44,10 +46,10 @@
 ## Content Management
 
 - **Git Submodules**: External libraries managed as independent repositories
-- **Content Service**: TypeScript-first service with React cache integration
+- **Build-time Data Generation**: Static JSON files created during build process via `scripts/generate-library-data.ts`
 - **Metadata Processing**: Multi-source extraction from YAML frontmatter, JSON configs, and git history
-- **Git Integration**: Real-time repository analysis using simple-git library
-- **File-based Routing**: Next.js App Router for automatic route generation
+- **Git Integration**: Repository analysis using simple-git library during build time
+- **Dynamic Routing**: Next.js App Router with slug-based detail pages for all content types
 - **Type Safety**: Union types for cross-content operations and validation
 
 ## Content Service Dependencies
@@ -58,7 +60,10 @@
 
 ## UI Component Dependencies
 
+- **@radix-ui/react-accordion 1.2.12**: Collapsible content sections
+- **@radix-ui/react-separator 1.1.8**: Visual content dividers
 - **@radix-ui/react-slot 1.2.4**: Primitive component composition
+- **@radix-ui/react-tabs 1.1.13**: Tabbed interface components
 - **class-variance-authority 0.7.1**: Type-safe component variants
 - **clsx 2.1.1**: Conditional className utility
 - **tailwind-merge 3.4.0**: Tailwind class merging utility
@@ -67,35 +72,36 @@
 ## Content Service Architecture
 
 ### Core Components
-- **Content Service** (`lib/content-service.ts`): Main service with React cache integration
+- **Build Script** (`scripts/generate-library-data.ts`): Build-time data generation with metadata extraction
 - **Type Definitions** (`lib/types/content.ts`): TypeScript interfaces and union types
-- **File Parser** (`lib/utils/file-parser.ts`): File system utilities and parsing functions
-- **Metadata Extractor** (`lib/utils/metadata-extractor.ts`): Content-specific extraction logic
-- **Git Extractor** (`lib/utils/git-extractor.ts`): Git history analysis and information extraction
-- **Date Formatter** (`lib/utils/date-formatter.ts`): Date formatting and comparison utilities
+- **Library Parser** (`scripts/library-file-parser.ts`): File system utilities and parsing functions
+- **Metadata Extractor** (`scripts/metadata-extractor.ts`): Content-specific extraction logic
+- **Formatter Utilities** (`lib/formatter/`): Date, git, and slug formatting utilities
+- **Library Service** (`lib/library.ts`): Library name extraction utilities
 
 ### Type-Specific Services
-- **Prompts Service** (`lib/prompts.ts`): Prompts-specific operations with caching
-- **Agents Service** (`lib/agents.ts`): Agents-specific operations with caching
-- **Powers Service** (`lib/powers.ts`): Powers-specific operations with caching
-- **Steering Service** (`lib/steering.ts`): Steering documents operations with caching
-- **Hooks Service** (`lib/hooks.ts`): Hooks-specific operations with caching
+- **Prompts Service** (`lib/prompts.ts`): Prompts data loading from static JSON
+- **Agents Service** (`lib/agents.ts`): Agents data loading from static JSON
+- **Powers Service** (`lib/powers.ts`): Powers data loading from static JSON
+- **Steering Service** (`lib/steering.ts`): Steering documents data loading from static JSON
+- **Hooks Service** (`lib/hooks.ts`): Hooks data loading from static JSON
 
 ### Key Features
-- **Union Type System**: Type-safe operations across all content types
+- **Build-time Processing**: All content processed during build for optimal performance
+- **Static Data Generation**: Pre-compiled JSON files in `data/` directory
 - **Intelligent Metadata Resolution**: Frontmatter → Git → Placeholders fallback strategy
-- **Performance Optimization**: React cache for request-level memoization
-- **Error Resilience**: Graceful handling of missing files and corrupted data
+- **Error Resilience**: Graceful handling of missing files and corrupted data during build
 - **Git Integration**: Author attribution, commit history, and content lifecycle tracking
-- **Content Validation**: Filtering of incomplete or invalid content
+- **Content Validation**: Filtering of incomplete or invalid content during build process
 
 ### Content Processing Flow
-1. **Discovery**: Scan library directories for content
-2. **Parsing**: Extract content from markdown, JSON, and YAML files
-3. **Git Analysis**: Retrieve author, dates, and commit information
-4. **Validation**: Filter incomplete or invalid content
-5. **Caching**: Store processed content with React cache
-6. **Serving**: Provide type-safe API for components
+1. **Build Trigger**: `prebuild` script runs before Next.js build
+2. **Discovery**: Scan library directories for content
+3. **Parsing**: Extract content from markdown, JSON, and YAML files
+4. **Git Analysis**: Retrieve author, dates, and commit information
+5. **Validation**: Filter incomplete or invalid content
+6. **JSON Generation**: Create static JSON files in `data/` directory
+7. **Runtime Loading**: Services load pre-generated JSON data
 
 ## Component Architecture
 
@@ -107,6 +113,17 @@
 ### Content Components
 - **Grid Component** (`components/grid.tsx`): Responsive grid with type-safe rendering
 - **Content Cards**: Type-specific cards (prompt-card, agent-card, power-card, steering-card, hook-card)
+- **Reusable Components**: Modular content display components
+  - **Content Header** (`components/content-header.tsx`): Standardized content headers
+  - **Content Date** (`components/content-date.tsx`): Date formatting and display
+  - **Contributor Info** (`components/contributor-info.tsx`): Author and git information
+  - **Git Hash** (`components/git-hash.tsx`): Git commit hash display
+  - **GitHub Link** (`components/github-link.tsx`): Repository links
+  - **Keywords** (`components/keywords.tsx`): Keyword tag display
+  - **Badge Container** (`components/badge-container.tsx`): Badge grouping utility
+  - **Content Type Badge** (`components/content-type-badge.tsx`): Content type indicators
+  - **Library Badge** (`components/library-badge.tsx`): Library source indicators
+  - **Hook Trigger Badge** (`components/hook-trigger-badge.tsx`): Hook trigger type display
 - **Skeleton States**: Loading placeholders for all content types
 
 ### Component Features
@@ -131,7 +148,7 @@ bun dev
 
 ### Build and Deployment
 ```bash
-# Build production bundle
+# Generate static data and build production bundle
 npm run build
 
 # Start production server
@@ -148,6 +165,15 @@ npm run test
 
 # Run tests in watch mode
 npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run coverage in watch mode
+npm run test:coverage:watch
+
+# Run coverage for CI
+npm run test:coverage:ci
 ```
 
 ### Code Quality
@@ -173,13 +199,16 @@ git submodule add <repository-url> libraries/<library-name>
 
 ### Content Service Testing
 ```bash
-# Test content service functionality
-npm run dev
-# Navigate to http://localhost:3000/test-content
+# Build and test static data generation
+npm run build
 
-# Validate git integration
-git submodule update --init --recursive
-# Check git coverage and analytics in test interface
+# Validate generated JSON files
+ls -la data/
+cat data/prompts.json | jq length
+cat data/agents.json | jq length
+cat data/powers.json | jq length
+cat data/steering.json | jq length
+cat data/hooks.json | jq length
 ```
 
 ### Content Development

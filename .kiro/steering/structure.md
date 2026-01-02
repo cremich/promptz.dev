@@ -5,12 +5,21 @@
 ```
 promptz.dev/
 ├── app/                    # Next.js App Router pages and layouts
-│   ├── agents/             # Custom agents listing page
-│   ├── hooks/              # Agent hooks listing page
-│   ├── powers/             # Kiro powers listing page
-│   ├── prompts/            # Prompts listing page
-│   ├── steering/           # Steering documents listing page
-│   ├── test-content/       # Content service testing interface
+│   ├── agents/             # Custom agents listing and detail pages
+│   │   ├── [slug]/         # Dynamic agent detail pages
+│   │   └── page.tsx        # Agents listing page
+│   ├── hooks/              # Agent hooks listing and detail pages
+│   │   ├── [slug]/         # Dynamic hook detail pages
+│   │   └── page.tsx        # Hooks listing page
+│   ├── powers/             # Kiro powers listing and detail pages
+│   │   ├── [slug]/         # Dynamic power detail pages
+│   │   └── page.tsx        # Powers listing page
+│   ├── prompts/            # Prompts listing and detail pages
+│   │   ├── [slug]/         # Dynamic prompt detail pages
+│   │   └── page.tsx        # Prompts listing page
+│   ├── steering/           # Steering documents listing and detail pages
+│   │   ├── [slug]/         # Dynamic steering detail pages
+│   │   └── page.tsx        # Steering listing page
 │   ├── layout.tsx          # Root layout with fonts and metadata
 │   ├── page.tsx            # Homepage with latest content sections
 │   ├── globals.css         # Global styles with Tailwind imports
@@ -18,22 +27,48 @@ promptz.dev/
 ├── components/             # React components
 │   ├── ui/                 # Shadcn UI components
 │   ├── *-card.tsx          # Content type-specific card components
-│   └── grid.tsx            # Responsive grid with skeleton states
-├── lib/                    # Content service and utilities
+│   ├── badge-container.tsx # Badge grouping utility component
+│   ├── content-date.tsx    # Date formatting and display component
+│   ├── content-header.tsx  # Standardized content headers
+│   ├── content-type-badge.tsx # Content type indicator badges
+│   ├── contributor-info.tsx # Author and git information display
+│   ├── git-hash.tsx        # Git commit hash display component
+│   ├── github-link.tsx     # Repository link component
+│   ├── grid.tsx            # Responsive grid with skeleton states
+│   ├── hook-trigger-badge.tsx # Hook trigger type display
+│   ├── keywords.tsx        # Keyword tag display component
+│   └── library-badge.tsx   # Library source indicator badges
+├── data/                   # Generated static JSON files (build output)
+│   ├── agents.json         # Pre-generated agents data
+│   ├── hooks.json          # Pre-generated hooks data
+│   ├── powers.json         # Pre-generated powers data
+│   ├── prompts.json        # Pre-generated prompts data
+│   └── steering.json       # Pre-generated steering data
+├── lib/                    # Services and utilities
+│   ├── formatter/          # Formatting utilities
+│   │   ├── date.ts         # Date formatting and comparison
+│   │   ├── git.ts          # Git information formatting
+│   │   └── slug.ts         # URL slug generation utilities
 │   ├── types/              # TypeScript type definitions
-│   ├── utils/              # Utility functions and parsers
-│   ├── content-service.ts  # Main content service with caching
-│   ├── prompts.ts          # Prompts-specific service functions
-│   ├── agents.ts           # Agents-specific service functions
-│   ├── powers.ts           # Powers-specific service functions
-│   ├── steering.ts         # Steering-specific service functions
-│   └── hooks.ts            # Hooks-specific service functions
+│   │   └── content.ts      # Content type interfaces and unions
+│   ├── agents.ts           # Agents data loading service
+│   ├── hooks.ts            # Hooks data loading service
+│   ├── library.ts          # Library service
+│   ├── powers.ts           # Powers data loading service
+│   ├── prompts.ts          # Prompts data loading service
+│   ├── steering.ts         # Steering data loading service
+│   └── utils.ts            # General utility functions
 ├── libraries/              # Git submodules for content libraries
 │   ├── kiro-powers/        # Official Kiro powers library
 │   └── promptz/            # Community prompts and resources
+├── scripts/                # Build-time scripts
+│   ├── generate-library-data.ts # Main build-time data generation script
+│   ├── library-file-parser.ts   # File system parsing utilities
+│   └── metadata-extractor.ts    # Content metadata extraction logic
 ├── __tests__/              # Test suites
 │   ├── unit/               # Unit tests for components and utilities
 │   └── property/           # Property-based tests (ephemeral)
+├── coverage/               # Test coverage reports (generated)
 ├── public/                 # Static assets (images, icons, fonts)
 ├── .kiro/                  # Kiro configuration and steering files
 ├── .next/                  # Next.js build output (generated)
@@ -45,20 +80,24 @@ promptz.dev/
 
 ### lib/ Directory Structure
 - **lib/types/content.ts**: TypeScript interfaces for all content types with union types
-- **lib/utils/file-parser.ts**: File system utilities and parsing functions
-- **lib/utils/metadata-extractor.ts**: Content-specific metadata extraction logic
-- **lib/utils/git-extractor.ts**: Git history analysis and information extraction
-- **lib/utils/date-formatter.ts**: Date formatting and comparison utilities
-- **lib/content-service.ts**: Main service with React cache integration
-- **lib/{type}.ts**: Type-specific service functions (prompts.ts, agents.ts, etc.)
+- **lib/formatter/date.ts**: Date formatting and comparison utilities
+- **lib/formatter/git.ts**: Git information formatting utilities
+- **lib/formatter/slug.ts**: URL slug generation utilities
+- **lib/library.ts**: Library name extraction utilities
+- **lib/{type}.ts**: Type-specific data loading services (prompts.ts, agents.ts, etc.)
+
+### Build Scripts Structure
+- **scripts/generate-library-data.ts**: Main build-time data generation script
+- **scripts/library-file-parser.ts**: File system utilities and parsing functions
+- **scripts/metadata-extractor.ts**: Content-specific metadata extraction logic
 
 ### Content Service Features
-- **Type-safe content processing**: Union types enable cross-content operations
+- **Build-time processing**: All content processed during build for optimal performance
+- **Static data generation**: Pre-compiled JSON files in `data/` directory
 - **Intelligent metadata extraction**: Multi-source fallback strategy (frontmatter → git → placeholders)
-- **Git integration**: Real author attribution, commit history, and content lifecycle tracking
-- **Performance optimization**: React cache for request-level memoization
-- **Error resilience**: Graceful handling of missing files and corrupted data
-- **Content validation**: Filtering of incomplete or invalid content
+- **Git integration**: Author attribution, commit history, and content lifecycle tracking
+- **Error resilience**: Graceful handling of missing files and corrupted data during build
+- **Content validation**: Filtering of incomplete or invalid content during build process
 
 ### Content Type System
 ```typescript
@@ -85,15 +124,21 @@ interface BaseContent {
 - **app/favicon.ico**: Site favicon and branding assets
 
 ### Content Type Pages
-- **app/prompts/page.tsx**: Prompts listing with server-side data fetching
+- **app/prompts/page.tsx**: Prompts listing with static data loading
+- **app/prompts/[slug]/page.tsx**: Dynamic prompt detail pages with slug routing
 - **app/agents/page.tsx**: Custom agents listing with metadata display
+- **app/agents/[slug]/page.tsx**: Dynamic agent detail pages with slug routing
 - **app/powers/page.tsx**: Kiro powers listing with MCP configuration info
+- **app/powers/[slug]/page.tsx**: Dynamic power detail pages with slug routing
 - **app/steering/page.tsx**: Steering documents listing with category filtering
+- **app/steering/[slug]/page.tsx**: Dynamic steering detail pages with slug routing
 - **app/hooks/page.tsx**: Agent hooks listing with trigger information
+- **app/hooks/[slug]/page.tsx**: Dynamic hook detail pages with slug routing
 
 ### Testing Interface
-- **app/test-content/**: Content service testing and validation interface
-- **app/test-content/components/**: Test-specific components for debugging
+- **Removed**: Test content interface has been removed in favor of build-time validation
+- **Build validation**: Content validation occurs during the build process via `scripts/generate-library-data.ts`
+- **Static data verification**: Generated JSON files can be inspected in the `data/` directory
 
 ## Components Architecture
 
@@ -109,6 +154,17 @@ interface BaseContent {
 - **components/power-card.tsx**: Power card with keywords and MCP info
 - **components/steering-card.tsx**: Steering document card with category
 - **components/hook-card.tsx**: Hook card with trigger information
+- **Reusable Content Components**:
+  - **components/content-header.tsx**: Standardized content headers with title and metadata
+  - **components/content-date.tsx**: Date formatting and display component
+  - **components/contributor-info.tsx**: Author and git information display
+  - **components/git-hash.tsx**: Git commit hash display component
+  - **components/github-link.tsx**: Repository link component
+  - **components/keywords.tsx**: Keyword tag display component
+  - **components/badge-container.tsx**: Badge grouping utility component
+  - **components/content-type-badge.tsx**: Content type indicator badges
+  - **components/library-badge.tsx**: Library source indicator badges
+  - **components/hook-trigger-badge.tsx**: Hook trigger type display
 
 ### Component Features
 - **Type-safe rendering**: Union type discrimination for content cards
@@ -227,17 +283,17 @@ prompts/
 ## Development Workflow Structure
 
 ### Local Development
-1. **Root level**: Main application development with content service integration
+1. **Root level**: Main application development with static data generation
 2. **Libraries**: Navigate to submodules for content editing
 3. **Submodule workflow**: Independent git repositories with their own commit history
-4. **Content service testing**: Use `/test-content` route for validation and debugging
+4. **Build validation**: Use `npm run build` to validate content processing and generate static data
 
 ### Content Service Development
 1. **Type definitions**: Start with `lib/types/content.ts` for new content types
-2. **Metadata extraction**: Add extractors in `lib/utils/metadata-extractor.ts`
-3. **Service integration**: Update `lib/content-service.ts` for new content sources
+2. **Metadata extraction**: Add extractors in `scripts/metadata-extractor.ts`
+3. **Build script integration**: Update `scripts/generate-library-data.ts` for new content sources
 4. **Type-specific services**: Create dedicated service files (e.g., `lib/prompts.ts`)
-5. **Testing**: Validate with test components and git integration showcase
+5. **Testing**: Validate with unit tests and build process verification
 
 ### Content Contribution
 1. **Fork library**: Create fork of specific library repository
@@ -251,21 +307,20 @@ prompts/
 
 - **Static assets**: Served from public/ directory
 - **API routes**: Server-side functionality (if added to app/api/)
-- **Generated pages**: Static and server-rendered pages from app/ directory
-- **Submodule content**: Included in build process for content rendering
-- **Content service**: Server-side rendering with React cache optimization
-- **Git integration**: Repository analysis during build time for metadata extraction
+- **Generated pages**: Static and server-rendered pages from app/ directory with dynamic routing
+- **Submodule content**: Processed during build time and served as static JSON files
+- **Build-time processing**: Content analysis and metadata extraction during build
+- **Static data serving**: Pre-generated JSON files for optimal performance
 
 ## Testing and Validation
 
-### Content Service Testing
-- **Test route**: `/test-content` provides comprehensive content service validation
-- **Git showcase**: Demonstrates git integration features and analytics
-- **Union type examples**: Shows type-safe content processing patterns
-- **Error handling**: Validates graceful degradation with missing content
+### Build-time Validation
+- **Build script validation**: `scripts/generate-library-data.ts` validates content during build
+- **Static data generation**: Comprehensive content processing with error handling
+- **JSON file inspection**: Generated files in `data/` directory can be inspected for validation
 
 ### Content Validation
-- **Metadata completeness**: Checks for required fields and fallback strategies
+- **Metadata completeness**: Checks for required fields and fallback strategies during build
 - **Git integration**: Validates author attribution and commit history extraction
 - **Type safety**: Ensures all content types conform to TypeScript interfaces
-- **Performance**: Monitors caching effectiveness and response times
+- **Performance**: Monitors build-time processing and static data generation efficiency

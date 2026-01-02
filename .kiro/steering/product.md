@@ -22,31 +22,33 @@ Promptz.dev is a comprehensive library and community platform for AI-assisted de
 ## Key Features
 
 - **Git-based content management** through libraries added as git submodules
-- **Intelligent content service** with TypeScript-first architecture and React caching
-- **Rich metadata extraction** from YAML frontmatter, JSON configs, and git history
-- **Real-time git integration** providing author attribution, commit history, and content lifecycle tracking
+- **Build-time data generation** with pre-compiled JSON files for optimal performance
+- **Rich metadata extraction** from YAML frontmatter, JSON configs, and git history during build
+- **Git integration** providing author attribution, commit history, and content lifecycle tracking
 - **Type-safe content processing** using union types for cross-content operations
-- **Efficient content discovery** across multiple libraries with advanced search and filtering
+- **Dynamic detail pages** with slug-based routing for all content types
+- **Efficient content discovery** across multiple libraries with static data serving
 - **Community analytics** showing contributor activity, content evolution, and collaboration patterns
 - **Graceful error handling** ensuring platform stability despite missing or corrupted content
-- **Performance optimization** through request-level memoization and git repository caching
-- **Modern UI/UX** with Shadcn UI components, Tailwind CSS, and responsive design
+- **Performance optimization** through build-time processing and static data generation
+- **Modern UI/UX** with modular Shadcn UI components, Tailwind CSS, and responsive design
 - **Server-side rendering** with Next.js App Router for optimal performance
-- **Comprehensive testing** with Jest, React Testing Library, and property-based testing
+- **Comprehensive testing** with Jest, React Testing Library, and extensive component coverage
 
 ## Content Organization Strategy
 
 - **Libraries are managed as git submodules** for independent versioning and contribution
 - **Each library focuses on specific domains** or use cases (official powers vs community content)
 - **Content is organized by type** (prompts, steering, agents, hooks, powers) with consistent interfaces
-- **Hierarchical structure enables easy discovery** and navigation through type-safe APIs
+- **Build-time processing** generates static JSON files for optimal performance and reliability
+- **Dynamic routing** enables detailed content pages with slug-based URLs for all content types
 - **Metadata is intelligently extracted** from multiple sources with fallback strategies:
   - Primary: YAML frontmatter and JSON configuration files
   - Secondary: Git history for author attribution and dates
   - Fallback: Generated metadata with placeholder values
 - **Community contributions are encouraged** through standardized formats and git-based workflows
-- **Content validation and filtering** ensures only complete, valid content is displayed
-- **Real-time analytics** provide insights into content evolution and contributor activity
+- **Content validation and filtering** ensures only complete, valid content is processed during build
+- **Static data serving** provides fast, reliable content delivery with pre-generated analytics
 
 ## Platform Architecture
 
@@ -64,10 +66,11 @@ Promptz.dev is a comprehensive library and community platform for AI-assisted de
 - **Responsive design** optimized for desktop and mobile devices
 - **Dark mode first** with light mode alternative
 - **Progressive loading** with skeleton states and Suspense boundaries
-- **Type-ahead search** and filtering across all content types
-- **Detailed content pages** with metadata, git history, and related content
-- **Contributor profiles** showing activity and contributions across libraries
-- **Content analytics** displaying usage patterns and community engagement
+- **Dynamic content pages** with slug-based routing for detailed content views
+- **Modular component system** with reusable content display components
+- **Fast static data serving** with pre-generated JSON files for optimal performance
+- **Rich metadata display** including git history, contributor information, and content analytics
+- **Accessible UI components** with ARIA labels, semantic HTML, and keyboard navigation
 
 ## Success Metrics
 
