@@ -17,6 +17,7 @@ import type {
   SearchIndexItem,
   SearchIndex
 } from '../lib/types/content'
+import { idToSlug } from '../lib/formatter/slug'
 
 const DATA_PATH = path.join(process.cwd(), 'data')
 const SEARCH_INDEX_PATH = path.join(DATA_PATH, 'search-index.json')
@@ -205,8 +206,14 @@ function extractKeywords(item: ContentItem): string[] {
  * Generate detail page path for content item
  */
 function generateDetailPath(type: string, id: string): string {
-  const slug = id.split('/').pop() || ''
-  return `/${type}s/${slug}`
+  try {
+    const slug = idToSlug(id)
+    return `/${type}s/${slug}`
+  } catch {
+    // Fallback to simple slug if idToSlug fails
+    const simpleName = id.split('/').pop() || ''
+    return `/${type}s/${simpleName}`
+  }
 }
 
 /**
