@@ -20,8 +20,8 @@ import {
   SearchEmptyState,
   SearchNoResults,
   SearchLoading
-} from '@/components/search/SearchResults'
-import { SearchFooter } from '@/components/search/SearchFooter'
+} from '@/components/search/search-results'
+import { SearchFooter } from '@/components/search/search-footer'
 import { useSearchModal } from '@/components/search/useSearchModal'
 
 export function SearchModal() {

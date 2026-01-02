@@ -8,7 +8,7 @@ import {
   SearchEmptyState,
   SearchNoResults,
   SearchLoading
-} from '@/components/search/SearchResults'
+} from '@/components/search/search-results'
 
 jest.mock('next/link', () => {
   return function MockLink({ children, href, onClick }: { children: React.ReactNode; href: string; onClick?: () => void }) {

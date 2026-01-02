@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { SearchModal } from '@/components/search/SearchModal'
+import { SearchModal } from '@/components/search/search-modal'
 import { useSearch } from '@/components/search-provider'
 import { useSearchModal } from '@/components/search/useSearchModal'
 
