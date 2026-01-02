@@ -71,3 +71,26 @@ export interface Library {
 }
 
 export type ContentItem = Prompt | Agent | Power | SteeringDocument | Hook
+
+// Search index types
+export interface SearchIndexItem {
+  id: string
+  type: 'prompt' | 'agent' | 'power' | 'steering' | 'hook'
+  title: string
+  description: string
+  content: string
+  author: string
+  date: string
+  library: string
+  path: string
+  keywords?: string[]
+}
+
+export interface SearchIndex {
+  items: SearchIndexItem[]
+  metadata: {
+    generatedAt: string
+    totalItems: number
+    itemsByType: Record<string, number>
+  }
+}

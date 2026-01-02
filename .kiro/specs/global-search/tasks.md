@@ -6,7 +6,7 @@ This implementation plan breaks down the global search feature into discrete, ma
 
 ## Tasks
 
-- [ ] 1. Set up search index generation infrastructure
+- [x] 1. Set up search index generation infrastructure
   - Create build script for search index generation
   - Update package.json prebuild script
   - Add search index types to content types
