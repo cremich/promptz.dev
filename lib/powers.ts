@@ -37,7 +37,6 @@ export const getAllPowers = cache(async (): Promise<Power[]> => {
  * Defaults to returning all powers if no limit specified
  */
 export const getLatestPowers = cache(async (limit?: number): Promise<Power[]> => {
-  try {
     const allPowers = await getAllPowers()
     
     // Return limited results if limit specified
@@ -47,12 +46,6 @@ export const getLatestPowers = cache(async (limit?: number): Promise<Power[]> =>
     
     // Return all powers if no limit
     return allPowers
-    
-  } catch (error) {
-    console.error('Error fetching latest powers:', error)
-    // Return empty array on error to prevent page crashes
-    return []
-  }
 })
 
 /**
@@ -61,17 +54,10 @@ export const getLatestPowers = cache(async (limit?: number): Promise<Power[]> =>
  * Returns null if power is not found
  */
 export const getPowerById = cache(async (id: string): Promise<Power | null> => {
-  try {
     const allPowers = await getAllPowers()
-    
+  
     // Find power by exact ID match
-    const power = allPowers.find(p => p.id === id)
-    
+    const power = allPowers.find(p => p.id === id)    
     return power || null
-    
-  } catch (error) {
-    console.error('Error fetching power by ID:', error)
-    // Return null on error to trigger 404 page
-    return null
-  }
+
 })

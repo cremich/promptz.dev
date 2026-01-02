@@ -65,7 +65,6 @@ describe('ContentTypeBadge', () => {
   })
 
   it('should use secondary variant for unknown content type', () => {
-    // @ts-expect-error Testing unknown content type
     render(<ContentTypeBadge contentType="unknown" />)
     
     const badge = screen.getByTestId('badge')

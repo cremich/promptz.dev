@@ -37,7 +37,6 @@ export const getAllPrompts = cache(async (): Promise<Prompt[]> => {
  * Defaults to returning all prompts if no limit specified
  */
 export const getLatestPrompts = cache(async (limit?: number): Promise<Prompt[]> => {
-  try {
     const allPrompts = await getAllPrompts()
     
     // Return limited results if limit specified
@@ -47,12 +46,6 @@ export const getLatestPrompts = cache(async (limit?: number): Promise<Prompt[]> 
     
     // Return all prompts if no limit
     return allPrompts
-    
-  } catch (error) {
-    console.error('Error fetching latest prompts:', error)
-    // Return empty array on error to prevent page crashes
-    return []
-  }
 })
 
 /**
@@ -61,16 +54,10 @@ export const getLatestPrompts = cache(async (limit?: number): Promise<Prompt[]> 
  * Returns null if prompt not found
  */
 export const getPromptById = cache(async (id: string): Promise<Prompt | null> => {
-  try {
     const allPrompts = await getAllPrompts()
     
     // Find prompt with matching ID
     const prompt = allPrompts.find(p => p.id === id)
     
     return prompt || null
-    
-  } catch (error) {
-    console.error('Error fetching prompt by ID:', error)
-    return null
-  }
 })

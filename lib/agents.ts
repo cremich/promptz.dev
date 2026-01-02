@@ -37,7 +37,6 @@ export const getAllAgents = cache(async (): Promise<Agent[]> => {
  * Defaults to returning all agents if no limit specified
  */
 export const getLatestAgents = cache(async (limit?: number): Promise<Agent[]> => {
-  try {
     const allAgents = await getAllAgents()
     
     // Return limited results if limit specified and greater than 0
@@ -52,12 +51,6 @@ export const getLatestAgents = cache(async (limit?: number): Promise<Agent[]> =>
     
     // Return all agents if no limit
     return allAgents
-    
-  } catch (error) {
-    console.error('Error fetching latest agents:', error)
-    // Return empty array on error to prevent page crashes
-    return []
-  }
 })
 
 /**
@@ -66,17 +59,9 @@ export const getLatestAgents = cache(async (limit?: number): Promise<Agent[]> =>
  * Returns null if agent is not found
  */
 export const getAgentById = cache(async (id: string): Promise<Agent | null> => {
-  try {
     const allAgents = await getAllAgents()
     
     // Find agent with matching ID
     const agent = allAgents.find(a => a.id === id)
-    
     return agent || null
-    
-  } catch (error) {
-    console.error(`Error fetching agent with ID ${id}:`, error)
-    // Return null on error to trigger 404 page
-    return null
-  }
 })

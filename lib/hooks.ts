@@ -37,7 +37,6 @@ export const getAllHooks = cache(async (): Promise<Hook[]> => {
  * Defaults to returning all hooks if no limit specified
  */
 export const getLatestHooks = cache(async (limit?: number): Promise<Hook[]> => {
-  try {
     const allHooks = await getAllHooks()
     
     // Return limited results if limit specified and greater than 0
@@ -52,12 +51,6 @@ export const getLatestHooks = cache(async (limit?: number): Promise<Hook[]> => {
     
     // Return all hooks if no limit
     return allHooks
-    
-  } catch (error) {
-    console.error('Error fetching latest hooks:', error)
-    // Return empty array on error to prevent page crashes
-    return []
-  }
 })
 
 /**
@@ -66,17 +59,9 @@ export const getLatestHooks = cache(async (limit?: number): Promise<Hook[]> => {
  * Returns null if hook not found
  */
 export const getHookById = cache(async (id: string): Promise<Hook | null> => {
-  try {
     const allHooks = await getAllHooks()
     
     // Find hook with matching ID
     const hook = allHooks.find(h => h.id === id)
-    
     return hook || null
-    
-  } catch (error) {
-    console.error('Error fetching hook by ID:', error)
-    // Return null on error to trigger 404 page
-    return null
-  }
 })

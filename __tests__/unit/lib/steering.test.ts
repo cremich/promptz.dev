@@ -1,4 +1,4 @@
-import { getAllSteering, getLatestSteering } from '@/lib/steering'
+import { getAllSteering, getLatestSteering, getSteeringById } from '@/lib/steering'
 
 // Mock the JSON import - Jest will automatically use the mock file
 jest.mock('@/data/steering.json', () => jest.requireActual('../../../__mocks__/data/steering.json'))
@@ -34,6 +34,95 @@ describe('Steering utilities', () => {
       const docC = result.find(doc => doc.id === 'steering-c')
       expect(docC?.git).toBeUndefined()
       expect(docC?.date).toBe('2024-01-14')
+    })
+
+    test('should fallback to frontmatter date when git creation date is not available', async () => {
+      // Mock data with mixed git availability
+      const mockDataWithMixedGit = [
+        {
+          type: 'steering',
+          id: 'steering-with-git',
+          title: 'Steering With Git',
+          author: 'Author',
+          date: '2024-01-10',
+          path: 'test/path',
+          content: 'content',
+          description: 'description',
+          category: 'test',
+          git: {
+            author: 'Git Author',
+            authorEmail: 'git@example.com',
+            createdDate: '2024-01-20T10:00:00Z',
+            lastModifiedDate: '2024-01-20T10:00:00Z',
+            commitHash: 'abc123',
+            commitMessage: 'commit'
+          }
+        },
+        {
+          type: 'steering',
+          id: 'steering-without-git',
+          title: 'Steering Without Git',
+          author: 'Author',
+          date: '2024-01-25',
+          path: 'test/path',
+          content: 'content',
+          description: 'description',
+          category: 'test'
+          // No git property
+        }
+      ]
+
+      jest.doMock('@/data/steering.json', () => mockDataWithMixedGit)
+      jest.resetModules()
+      const { getAllSteering: getAllSteeringWithMixedGit } = await import('@/lib/steering')
+
+      const result = await getAllSteeringWithMixedGit()
+
+      expect(result).toHaveLength(2)
+      // Steering without git should be first (2024-01-25 > 2024-01-20)
+      expect(result[0].id).toBe('steering-without-git')
+      expect(result[1].id).toBe('steering-with-git')
+    })
+
+    test('should sort by frontmatter date when both steering documents lack git creation date', async () => {
+      // Mock data with no git information
+      const mockDataWithoutGit = [
+        {
+          type: 'steering',
+          id: 'steering-older',
+          title: 'Older Steering',
+          author: 'Author',
+          date: '2024-01-10',
+          path: 'test/path',
+          content: 'content',
+          description: 'description',
+          category: 'test'
+          // No git property
+        },
+        {
+          type: 'steering',
+          id: 'steering-newer',
+          title: 'Newer Steering',
+          author: 'Author',
+          date: '2024-01-20',
+          path: 'test/path',
+          content: 'content',
+          description: 'description',
+          category: 'test'
+          // No git property
+        }
+      ]
+
+      jest.doMock('@/data/steering.json', () => mockDataWithoutGit)
+      jest.resetModules()
+      const { getAllSteering: getAllSteeringWithoutGit } = await import('@/lib/steering')
+
+      const result = await getAllSteeringWithoutGit()
+
+      expect(result).toHaveLength(2)
+      // Newer steering should be first (2024-01-20 > 2024-01-10)
+      expect(result[0].id).toBe('steering-newer')
+      expect(result[1].id).toBe('steering-older')
     })
 
     test('should return empty array when JSON processing fails', async () => {
@@ -106,6 +195,41 @@ describe('Steering utilities', () => {
       const result = await getLatestSteeringWithError(5)
 
       expect(result).toHaveLength(0)
+      expect(consoleSpy).toHaveBeenCalledWith('Error fetching steering documents:', expect.any(Error))
+      
+      consoleSpy.mockRestore()
+    })
+  })
+
+  describe('getSteeringById', () => {
+    test('should return steering document when found by ID', async () => {
+      const result = await getSteeringById('steering-a')
+
+      expect(result).not.toBeNull()
+      expect(result?.id).toBe('steering-a')
+      expect(result?.title).toBe('Steering A')
+    })
+
+    test('should return null when steering document not found', async () => {
+      const result = await getSteeringById('non-existent-steering')
+
+      expect(result).toBeNull()
+    })
+
+    test('should handle errors gracefully and return null', async () => {
+      // Mock console.error to avoid noise in test output
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      
+      // Mock the JSON data to be invalid
+      jest.doMock('@/data/steering.json', () => null)
+      
+      // Re-import the module to get the new mock
+      jest.resetModules()
+      const { getSteeringById: getSteeringByIdWithError } = await import('@/lib/steering')
+
+      const result = await getSteeringByIdWithError('steering-a')
+
+      expect(result).toBeNull()
       expect(consoleSpy).toHaveBeenCalledWith('Error fetching steering documents:', expect.any(Error))
       
       consoleSpy.mockRestore()

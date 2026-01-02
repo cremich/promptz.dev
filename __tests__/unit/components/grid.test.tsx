@@ -206,6 +206,25 @@ describe('Grid', () => {
     expect(screen.getByTestId('prompt-card')).toBeInTheDocument()
     expect(screen.queryByTestId('agent-card')).not.toBeInTheDocument()
   })
+
+  it('should handle unknown content type gracefully', () => {
+    // Create an item with an invalid type to test the default case
+    const invalidItem = {
+      ...mockContentItems[0],
+      type: 'unknown'
+    } as unknown
+    
+    //@ts-expect-error Testing invalid item type for error handling
+    const { container } = render(<Grid items={[invalidItem]} />)
+    
+    // Should not render any card for unknown type (returns null)
+    expect(screen.queryByTestId(/-(card)$/)).not.toBeInTheDocument()
+    
+    // Should still render the grid container
+    const gridContainer = container.firstChild
+    expect(gridContainer).toHaveClass('grid')
+    expect(gridContainer).toHaveClass('gap-6')
+  })
 })
 
 describe('GridSkeleton', () => {

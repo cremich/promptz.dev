@@ -73,7 +73,7 @@ function getPluralType(singularType: string): string {
     'hook': 'hooks'
   }
   
-  return typeMap[singularType] || `${singularType}s`
+  return typeMap[singularType]
 }
 
 /**

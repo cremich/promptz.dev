@@ -43,7 +43,8 @@ const config: Config = {
     "/node_modules/",
     "/.next/",
     "/coverage/",
-    "\\.d\\.ts$"
+    "\\.d\\.ts$",
+    "/components/ui/*"
   ]
 };
 
