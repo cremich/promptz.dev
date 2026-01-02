@@ -3,9 +3,8 @@
 import React from 'react'
 import Link from 'next/link'
 import type { FuseResult } from 'fuse.js'
-import { AlertCircle, RefreshCw } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import type { SearchIndexItem } from '@/lib/types/content'
 import type { SearchError } from '@/lib/search'
 import { highlightMatches, contentTypeConfig } from '@/lib/search'
@@ -29,7 +28,7 @@ export function SearchResults({
     <div className="max-h-96 overflow-y-auto" ref={resultsRef}>
       {results.map((result, index) => {
         const config = contentTypeConfig[result.item.type] || { badge: 'Content', color: 'gray' }
-        
+
         return (
           <div
             key={result.item.id}
@@ -43,19 +42,19 @@ export function SearchResults({
               <Badge variant="secondary" className="mt-0.5 shrink-0">
                 {config.badge}
               </Badge>
-              
+
               <div className="flex-1 min-w-0">
-                <h3 
+                <h3
                   className="font-medium text-sm truncate mb-1"
                   dangerouslySetInnerHTML={{
                     __html: highlightMatches(result.item.title, result.matches)
                   }}
                 />
-                
+
                 <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
                   {result.item.description}
                 </p>
-                
+
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-xs">
                     {result.item.library}
@@ -80,45 +79,19 @@ export function SearchResults({
 
 interface SearchErrorDisplayProps {
   error: SearchError
-  retryCount: number
-  maxRetries: number
-  onRetry: () => void
   onClose: () => void
 }
 
-export function SearchErrorDisplay({
-  error,
-  retryCount,
-  maxRetries,
-  onRetry,
-  onClose
-}: SearchErrorDisplayProps) {
+export function SearchErrorDisplay({ error, onClose }: SearchErrorDisplayProps) {
   return (
     <div className="p-8 text-center">
       <div className="flex justify-center mb-3">
         <AlertCircle className="h-8 w-8 text-destructive" />
       </div>
-      <div className="text-sm text-destructive mb-2">
+      <div className="text-sm text-destructive mb-4">
         {error.userMessage}
       </div>
-      {error.canRetry && retryCount < maxRetries && (
-        <Button 
-          variant="outline"
-          size="sm"
-          onClick={onRetry}
-          className="mb-4"
-        >
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Try again ({maxRetries - retryCount} attempts left)
-        </Button>
-      )}
-      {retryCount >= maxRetries && (
-        <div className="text-xs text-muted-foreground mb-4">
-          Maximum retry attempts reached.
-        </div>
-      )}
-      {/* Fallback browse options - Requirement 10.2 */}
-      <div className="border-t border-border pt-4 mt-4">
+      <div className="border-t border-border pt-4">
         <div className="text-xs text-muted-foreground mb-3">
           Browse content directly:
         </div>
@@ -162,7 +135,6 @@ interface SearchEmptyStateProps {
 export function SearchEmptyState({ hasPartialData, error }: SearchEmptyStateProps) {
   return (
     <div className="p-8 text-center">
-      {/* Partial data warning - Requirement 10.4 */}
       {hasPartialData && error?.type === 'partial_data' && (
         <div className="mb-4 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
           <div className="text-xs text-yellow-700 dark:text-yellow-400">
@@ -189,22 +161,6 @@ export function SearchNoResults({ query }: SearchNoResultsProps) {
       </div>
       <div className="text-xs text-muted-foreground">
         Try different keywords or check spelling
-      </div>
-    </div>
-  )
-}
-
-export function SearchQueryError() {
-  return (
-    <div className="p-8 text-center">
-      <div className="flex justify-center mb-3">
-        <AlertCircle className="h-6 w-6 text-destructive" />
-      </div>
-      <div className="text-sm text-destructive mb-2">
-        Search encountered an error. Please try a different query.
-      </div>
-      <div className="text-xs text-muted-foreground">
-        Try a different search term or browse content directly.
       </div>
     </div>
   )

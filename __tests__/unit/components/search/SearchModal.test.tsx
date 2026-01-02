@@ -1,80 +1,157 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { SearchModal } from '@/components/search/SearchModal'
-import { SearchProvider } from '@/components/search-provider'
+import { useSearch } from '@/components/search-provider'
+import { useSearchModal } from '@/components/search/useSearchModal'
 
-// Mock the dialog component to avoid portal rendering issues in tests
-jest.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) => (
-    <div data-testid="dialog" data-open={open}>
-      {children}
-    </div>
-  ),
-  DialogContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="dialog-content" className={className}>
-      {children}
-    </div>
-  ),
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: jest.fn() })
 }))
 
-// Mock the search index import
-jest.mock('@/data/search-index.json', () => ({
-  default: {
-    items: [
-      {
-        id: 'test/prompt/example',
-        type: 'prompt',
-        title: 'Test Prompt',
-        description: 'A test prompt for testing',
-        content: 'This is test content',
-        author: 'Test Author',
-        date: '2024-01-01',
-        library: 'test',
-        path: '/prompts/example',
-        keywords: ['test', 'example']
-      }
-    ],
-    metadata: {
-      generatedAt: '2024-01-01T00:00:00.000Z',
-      totalItems: 1,
-      itemsByType: { prompt: 1 }
-    }
-  }
+jest.mock('@/components/search-provider', () => ({
+  useSearch: jest.fn()
+}))
+
+jest.mock('@/components/search/useSearchModal', () => ({
+  useSearchModal: jest.fn()
+}))
+
+const mockUseSearch = useSearch as jest.MockedFunction<typeof useSearch>
+const mockUseSearchModal = useSearchModal as jest.MockedFunction<typeof useSearchModal>
+
+jest.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) => (
+    <div data-testid="dialog" data-open={open}>{children}</div>
+  ),
+  DialogContent: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-testid="dialog-content" className={className}>{children}</div>
+  ),
 }))
 
 describe('SearchModal', () => {
-  it('should render when search is closed', () => {
-    render(
-      <SearchProvider>
-        <SearchModal />
-      </SearchProvider>
-    )
+  const mockCloseSearch = jest.fn()
 
-    const dialog = screen.getByTestId('dialog')
-    expect(dialog).toHaveAttribute('data-open', 'false')
+  const defaultHookReturn = {
+    query: '',
+    setQuery: jest.fn(),
+    results: [],
+    selectedIndex: 0,
+    setSelectedIndex: jest.fn(),
+    isLoading: false,
+    error: null,
+    hasPartialData: false,
+    inputRef: { current: null },
+    resultsRef: { current: null },
+    handleKeyDown: jest.fn(),
+    handleResultClick: jest.fn()
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseSearch.mockReturnValue({
+      isOpen: false,
+      openSearch: jest.fn(),
+      closeSearch: mockCloseSearch
+    })
+    mockUseSearchModal.mockReturnValue(defaultHookReturn)
   })
 
-  it('should render search interface when open', () => {
-    // We need to test with the modal open, but since we can't easily trigger the open state
-    // in this test setup, we'll just verify the basic structure is rendered
-    render(
-      <SearchProvider>
-        <SearchModal />
-      </SearchProvider>
-    )
-
-    const dialog = screen.getByTestId('dialog')
-    expect(dialog).toBeInTheDocument()
+  it('renders when search is closed', () => {
+    render(<SearchModal />)
+    expect(screen.getByTestId('dialog')).toHaveAttribute('data-open', 'false')
   })
 
-  it('should have correct dialog content styling', () => {
-    render(
-      <SearchProvider>
-        <SearchModal />
-      </SearchProvider>
-    )
+  it('renders when search is open', () => {
+    mockUseSearch.mockReturnValue({
+      isOpen: true,
+      openSearch: jest.fn(),
+      closeSearch: mockCloseSearch
+    })
+    render(<SearchModal />)
+    expect(screen.getByTestId('dialog')).toHaveAttribute('data-open', 'true')
+  })
 
-    const dialogContent = screen.getByTestId('dialog-content')
-    expect(dialogContent).toHaveClass('max-w-2xl', 'max-h-[80vh]', 'p-0', 'gap-0')
+  it('shows loading state', () => {
+    mockUseSearch.mockReturnValue({ isOpen: true, openSearch: jest.fn(), closeSearch: mockCloseSearch })
+    mockUseSearchModal.mockReturnValue({ ...defaultHookReturn, isLoading: true })
+    render(<SearchModal />)
+    expect(screen.getByText('Loading search index...')).toBeInTheDocument()
+  })
+
+  it('shows empty state when no query', () => {
+    mockUseSearch.mockReturnValue({ isOpen: true, openSearch: jest.fn(), closeSearch: mockCloseSearch })
+    render(<SearchModal />)
+    expect(screen.getByText('Start typing to search across all libraries...')).toBeInTheDocument()
+  })
+
+  it('shows no results state', () => {
+    mockUseSearch.mockReturnValue({ isOpen: true, openSearch: jest.fn(), closeSearch: mockCloseSearch })
+    mockUseSearchModal.mockReturnValue({ ...defaultHookReturn, query: 'nonexistent' })
+    render(<SearchModal />)
+    expect(screen.getByText(/No results found for/)).toBeInTheDocument()
+  })
+
+  it('shows error display when error occurs', () => {
+    mockUseSearch.mockReturnValue({ isOpen: true, openSearch: jest.fn(), closeSearch: mockCloseSearch })
+    mockUseSearchModal.mockReturnValue({
+      ...defaultHookReturn,
+      error: {
+        type: 'index_load_failed',
+        message: 'Failed',
+        userMessage: 'Unable to load search data. Please try again.',
+        canRetry: true
+      }
+    })
+    render(<SearchModal />)
+    expect(screen.getByText('Unable to load search data. Please try again.')).toBeInTheDocument()
+  })
+
+  it('shows results when available', () => {
+    mockUseSearch.mockReturnValue({ isOpen: true, openSearch: jest.fn(), closeSearch: mockCloseSearch })
+    mockUseSearchModal.mockReturnValue({
+      ...defaultHookReturn,
+      query: 'test',
+      results: [{
+        item: {
+          id: 'test-1',
+          type: 'prompt',
+          title: 'Test Prompt',
+          description: 'A test prompt',
+          content: 'Content',
+          author: 'Author',
+          date: '2024-01-01',
+          library: 'test',
+          path: '/prompts/test',
+          keywords: []
+        },
+        refIndex: 0,
+        score: 0.1
+      }]
+    })
+    render(<SearchModal />)
+    expect(screen.getByText('A test prompt')).toBeInTheDocument()
+  })
+
+  it('shows partial data warning in empty state', () => {
+    mockUseSearch.mockReturnValue({ isOpen: true, openSearch: jest.fn(), closeSearch: mockCloseSearch })
+    mockUseSearchModal.mockReturnValue({
+      ...defaultHookReturn,
+      hasPartialData: true,
+      error: {
+        type: 'partial_data',
+        message: 'Some data missing',
+        userMessage: 'Some content may not appear in search results.',
+        canRetry: false
+      }
+    })
+    render(<SearchModal />)
+    expect(screen.getByText('Some content may not appear in search results.')).toBeInTheDocument()
+  })
+
+  it('disables input while loading', () => {
+    mockUseSearch.mockReturnValue({ isOpen: true, openSearch: jest.fn(), closeSearch: mockCloseSearch })
+    mockUseSearchModal.mockReturnValue({ ...defaultHookReturn, isLoading: true })
+    render(<SearchModal />)
+    expect(screen.getByPlaceholderText('What are you searching for?')).toBeDisabled()
   })
 })
