@@ -1,7 +1,5 @@
-import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { SearchButton } from '@/components/search-button'
-import { SearchProvider } from '@/components/search-provider'
 
 // Mock the useSearch hook
 const mockOpenSearch = jest.fn()
