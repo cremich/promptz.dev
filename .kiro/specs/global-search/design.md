@@ -6,12 +6,11 @@ The global search feature will provide users with a fast, intuitive way to find 
 
 ## Architecture
 
-The search system consists of four main components:
+The search system consists of three main components:
 
 1. **Build-time Search Index Generator**: Extends the existing build process to create a unified search index
-2. **Search Modal Component**: Client-side React component using shadcn dialog
-3. **Search Service**: Client-side service managing search operations and state
-4. **Global Keyboard Handler**: Application-wide keyboard shortcut listener
+2. **Search Modal Component**: Client-side React component using shadcn dialog with integrated Fuse.js
+3. **Global Keyboard Handler**: Application-wide keyboard shortcut listener
 
 ```mermaid
 graph TB
@@ -24,13 +23,12 @@ graph TB
     E --> G[Search Modal]
     F --> G
     
-    G --> H[Search Service]
-    H --> I[Fuse.js]
+    G --> H[Fuse.js Instance]
     H --> C
     
-    I --> J[Search Results]
-    J --> K[Navigation]
-    K --> L[Content Detail Pages]
+    H --> I[Search Results]
+    I --> J[Navigation]
+    J --> K[Content Detail Pages]
 ```
 
 ## Components and Interfaces
@@ -299,90 +297,88 @@ if (require.main === module) {
 ```typescript
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { SearchIcon } from 'lucide-react'
+import Fuse from 'fuse.js'
 import {
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog'
-import { useSearch } from '@/components/search-provider'
-import { SearchInput } from './SearchInput'
-import { SearchResults } from './SearchResults'
-
-export function SearchModal() {
-  const { isOpen, closeSearch } = useSearch()
-  
-  return (
-    <Dialog open={isOpen} onOpenChange={closeSearch}>
-      <DialogContent 
-        className="max-w-2xl max-h-[80vh] p-0 gap-0"
-        showCloseButton={false}
-      >
-        <SearchInput />
-        <SearchResults />
-        
-        {/* Footer with keyboard shortcuts */}
-        <div className="p-3 border-t border-border bg-muted/30">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">↑</kbd>
-                <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">↓</kbd>
-                <span>Navigate</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">↵</kbd>
-                <span>Select</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">Esc</kbd>
-              <span>Close</span>
-            </div>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  )
-}
-```
-
-**Search Input Component**: `components/search/SearchInput.tsx`
-
-```typescript
-'use client'
-
-import React, { useState, useEffect, useRef } from 'react'
-import { SearchIcon } from 'lucide-react'
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from '@/components/ui/input-group'
+import { Badge } from '@/components/ui/badge'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
-import { useSearchContext } from './SearchContext'
+import { useSearch } from '@/components/search-provider'
+import type { SearchIndexItem } from '@/lib/types/content'
 
-export function SearchInput() {
-  const { 
-    query, 
-    setQuery, 
-    selectedIndex, 
-    setSelectedIndex, 
-    results, 
-    handleResultSelect 
-  } = useSearchContext()
-  
+export function SearchModal() {
+  const { isOpen, closeSearch } = useSearch()
+  const router = useRouter()
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<Fuse.FuseResult<SearchIndexItem>[]>([])
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [fuse, setFuse] = useState<Fuse<SearchIndexItem> | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  
+  // Initialize Fuse.js when modal opens
+  useEffect(() => {
+    if (isOpen && !fuse) {
+      initializeFuse()
+    }
+  }, [isOpen, fuse])
   
   // Focus input when modal opens
   useEffect(() => {
-    const timer = setTimeout(() => {
-      inputRef.current?.focus()
-    }, 100)
-    
-    return () => clearTimeout(timer)
-  }, [])
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus()
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen])
   
-  // Handle keyboard navigation
+  // Search when query changes
+  useEffect(() => {
+    if (!fuse || !query.trim()) {
+      setResults([])
+      setSelectedIndex(0)
+      return
+    }
+    
+    const searchResults = fuse.search(query, { limit: 10 })
+    setResults(searchResults)
+    setSelectedIndex(0)
+  }, [query, fuse])
+  
+  const initializeFuse = async () => {
+    try {
+      const searchIndexData = await import('@/data/search-index.json')
+      const index = searchIndexData.default.items as SearchIndexItem[]
+      
+      const fuseOptions = {
+        keys: [
+          { name: 'title', weight: 0.4 },
+          { name: 'description', weight: 0.3 },
+          { name: 'content', weight: 0.2 },
+          { name: 'keywords', weight: 0.1 }
+        ],
+        threshold: 0.4,
+        includeScore: true,
+        includeMatches: true,
+        minMatchCharLength: 2,
+        ignoreLocation: true
+      }
+      
+      setFuse(new Fuse(index, fuseOptions))
+    } catch (error) {
+      console.error('Error loading search index:', error)
+    }
+  }
+  
   const handleKeyDown = (event: React.KeyboardEvent) => {
     switch (event.key) {
       case 'ArrowDown':
@@ -404,122 +400,11 @@ export function SearchInput() {
     }
   }
   
-  return (
-    <div className="p-4 pb-0">
-      <InputGroup>
-        <InputGroupAddon>
-          <SearchIcon className="h-4 w-4" />
-        </InputGroupAddon>
-        <InputGroupInput
-          ref={inputRef}
-          placeholder="What are you searching for?"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="text-base border-0 shadow-none focus-visible:ring-0"
-        />
-        <InputGroupAddon align="inline-end">
-          <KbdGroup>
-            <Kbd>⌘</Kbd>
-            <Kbd>K</Kbd>
-          </KbdGroup>
-        </InputGroupAddon>
-      </InputGroup>
-    </div>
-  )
-}
-```
-
-**Search Results Component**: `components/search/SearchResults.tsx`
-
-```typescript
-'use client'
-
-import React from 'react'
-import { useSearchContext } from './SearchContext'
-import { SearchItem } from './SearchItem'
-
-export function SearchResults() {
-  const { query, results, loading, error, selectedIndex } = useSearchContext()
-  
-  if (loading) {
-    return (
-      <div className="p-8 text-center text-muted-foreground">
-        <div className="animate-pulse">Searching...</div>
-      </div>
-    )
+  const handleResultSelect = (result: Fuse.FuseResult<SearchIndexItem>) => {
+    const path = `/${result.item.type}s/${result.item.id.split('/').pop()}`
+    closeSearch()
+    router.push(path)
   }
-  
-  if (error) {
-    return (
-      <div className="p-8 text-center">
-        <div className="text-destructive text-sm mb-2">Search Error</div>
-        <div className="text-muted-foreground text-xs">{error}</div>
-      </div>
-    )
-  }
-  
-  if (!query.trim()) {
-    return (
-      <div className="p-8 text-center text-muted-foreground text-sm">
-        Start typing to search across all libraries...
-      </div>
-    )
-  }
-  
-  if (results.length === 0) {
-    return (
-      <div className="p-8 text-center">
-        <div className="text-muted-foreground text-sm mb-2">
-          No results found for "{query}"
-        </div>
-        <div className="text-xs text-muted-foreground">
-          Try different keywords or check spelling
-        </div>
-      </div>
-    )
-  }
-  
-  return (
-    <div className="flex-1 overflow-hidden">
-      <div className="max-h-96 overflow-y-auto">
-        {results.slice(0, 10).map((result, index) => (
-          <SearchItem
-            key={result.item.id}
-            result={result}
-            isSelected={index === selectedIndex}
-            onClick={() => handleResultSelect(result)}
-          />
-        ))}
-        
-        {results.length > 10 && (
-          <div className="p-3 text-center text-xs text-muted-foreground border-t">
-            Showing first 10 of {results.length} results
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-```
-
-**Search Item Component**: `components/search/SearchItem.tsx`
-
-```typescript
-'use client'
-
-import React from 'react'
-import { Badge } from '@/components/ui/badge'
-import type { SearchResult } from '@/lib/types/content'
-
-interface SearchItemProps {
-  result: SearchResult
-  isSelected: boolean
-  onClick: () => void
-}
-
-export function SearchItem({ result, isSelected, onClick }: SearchItemProps) {
-  const { item } = result
   
   const contentTypeConfig = {
     prompt: { badge: 'Prompt', color: 'blue' },
@@ -529,228 +414,116 @@ export function SearchItem({ result, isSelected, onClick }: SearchItemProps) {
     hook: { badge: 'Hook', color: 'red' }
   }
   
-  const config = contentTypeConfig[item.type] || { badge: 'Content', color: 'gray' }
-  
-  return (
-    <div
-      className={`p-3 cursor-pointer border-b border-border last:border-b-0 transition-colors ${
-        isSelected ? 'bg-muted' : 'hover:bg-muted/50'
-      }`}
-      onClick={onClick}
-    >
-      <div className="flex items-start gap-3">
-        <Badge variant="secondary" className="mt-0.5 shrink-0">
-          {config.badge}
-        </Badge>
-        
-        <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-sm truncate mb-1">
-            {highlightMatches(item.title, result.matches)}
-          </h3>
-          
-          <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-            {item.description}
-          </p>
-          
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs">
-              {item.library}
-            </Badge>
-            <span className="text-xs text-muted-foreground">
-              by {item.author}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/**
- * Highlight matching text in search results
- */
-function highlightMatches(text: string, matches: SearchResult['matches']): React.ReactNode {
-  if (!matches || matches.length === 0) {
-    return text
-  }
-  
-  // Find matches for the title field
-  const titleMatch = matches.find(match => match.key === 'title')
-  if (!titleMatch || !titleMatch.indices) {
-    return text
-  }
-  
-  const indices = titleMatch.indices[0]
-  if (!indices) {
-    return text
-  }
-  
-  const [start, end] = indices
-  
-  return (
-    <>
-      {text.substring(0, start)}
-      <mark className="bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded">
-        {text.substring(start, end + 1)}
-      </mark>
-      {text.substring(end + 1)}
-    </>
-  )
-}
-```
-
-**Search Context**: `components/search/SearchContext.tsx`
-
-```typescript
-'use client'
-
-import React, { createContext, useContext, useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { searchContent } from '@/lib/search'
-import { useSearch } from '@/components/search-provider'
-import type { SearchResult } from '@/lib/types/content'
-
-interface SearchContextValue {
-  query: string
-  setQuery: (query: string) => void
-  results: SearchResult[]
-  loading: boolean
-  error: string | null
-  selectedIndex: number
-  setSelectedIndex: (index: number) => void
-  handleResultSelect: (result: SearchResult) => void
-}
-
-const SearchContext = createContext<SearchContextValue | undefined>(undefined)
-
-export function useSearchContext() {
-  const context = useContext(SearchContext)
-  if (!context) {
-    throw new Error('useSearchContext must be used within SearchContextProvider')
-  }
-  return context
-}
-
-interface SearchContextProviderProps {
-  children: React.ReactNode
-}
-
-export function SearchContextProvider({ children }: SearchContextProviderProps) {
-  const { closeSearch } = useSearch()
-  const router = useRouter()
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  
-  // Debounced search effect
-  useEffect(() => {
-    if (!query.trim()) {
-      setResults([])
-      setSelectedIndex(0)
-      setError(null)
-      return
-    }
-    
-    const timeoutId = setTimeout(async () => {
-      setLoading(true)
-      setError(null)
-      
-      try {
-        const searchResults = await searchContent(query)
-        setResults(searchResults)
-        setSelectedIndex(0)
-      } catch (err) {
-        setError('Search temporarily unavailable. Please try again.')
-        setResults([])
-      } finally {
-        setLoading(false)
-      }
-    }, 300)
-    
-    return () => clearTimeout(timeoutId)
-  }, [query])
-  
-  // Reset selected index when results change
-  useEffect(() => {
-    setSelectedIndex(0)
-  }, [results])
-  
-  const handleResultSelect = (result: SearchResult) => {
-    const path = `/${result.item.type}s/${result.item.id.split('/').pop()}`
-    closeSearch()
-    router.push(path)
-  }
-  
-  const value = {
-    query,
-    setQuery,
-    results,
-    loading,
-    error,
-    selectedIndex,
-    setSelectedIndex,
-    handleResultSelect
-  }
-  
-  return (
-    <SearchContext.Provider value={value}>
-      {children}
-    </SearchContext.Provider>
-  )
-}
-```
-
-**Updated Main Modal**: `components/search/SearchModal.tsx`
-
-```typescript
-'use client'
-
-import React from 'react'
-import {
-  Dialog,
-  DialogContent,
-} from '@/components/ui/dialog'
-import { useSearch } from '@/components/search-provider'
-import { SearchContextProvider } from './SearchContext'
-import { SearchInput } from './SearchInput'
-import { SearchResults } from './SearchResults'
-
-export function SearchModal() {
-  const { isOpen, closeSearch } = useSearch()
-  
   return (
     <Dialog open={isOpen} onOpenChange={closeSearch}>
       <DialogContent 
         className="max-w-2xl max-h-[80vh] p-0 gap-0"
         showCloseButton={false}
       >
-        <SearchContextProvider>
-          <SearchInput />
-          <SearchResults />
-          
-          {/* Footer with keyboard shortcuts */}
-          <div className="p-3 border-t border-border bg-muted/30">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">↑</kbd>
-                  <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">↓</kbd>
-                  <span>Navigate</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">↵</kbd>
-                  <span>Select</span>
-                </div>
+        {/* Search Input */}
+        <div className="p-4 pb-0">
+          <InputGroup>
+            <InputGroupInput
+              ref={inputRef}
+              placeholder="What are you searching for?"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="text-base border-0 shadow-none focus-visible:ring-0"
+            />
+            <InputGroupAddon>
+              <SearchIcon className="h-4 w-4" />
+            </InputGroupAddon>
+            <InputGroupAddon align="inline-end">
+              <KbdGroup>
+                <Kbd>⌘</Kbd>
+                <Kbd>K</Kbd>
+              </KbdGroup>
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
+        
+        {/* Search Results */}
+        <div className="flex-1 overflow-hidden">
+          {!query.trim() ? (
+            <div className="p-8 text-center text-muted-foreground text-sm">
+              Start typing to search across all libraries...
+            </div>
+          ) : results.length === 0 ? (
+            <div className="p-8 text-center">
+              <div className="text-muted-foreground text-sm mb-2">
+                No results found for "{query}"
               </div>
-              <div className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted rounded">Esc</kbd>
-                <span>Close</span>
+              <div className="text-xs text-muted-foreground">
+                Try different keywords or check spelling
               </div>
             </div>
+          ) : (
+            <div className="max-h-96 overflow-y-auto">
+              {results.map((result, index) => {
+                const config = contentTypeConfig[result.item.type] || { badge: 'Content', color: 'gray' }
+                
+                return (
+                  <div
+                    key={result.item.id}
+                    className={`p-3 cursor-pointer border-b border-border last:border-b-0 transition-colors ${
+                      index === selectedIndex ? 'bg-muted' : 'hover:bg-muted/50'
+                    }`}
+                    onClick={() => handleResultSelect(result)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Badge variant="secondary" className="mt-0.5 shrink-0">
+                        {config.badge}
+                      </Badge>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-sm truncate mb-1">
+                          {result.item.title}
+                        </h3>
+                        
+                        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                          {result.item.description}
+                        </p>
+                        
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">
+                            {result.item.library}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            by {result.item.author}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+        
+        {/* Footer with keyboard shortcuts */}
+        <div className="p-3 border-t border-border bg-muted/30">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                <KbdGroup>
+                  <Kbd>↑</Kbd>
+                  <Kbd>↓</Kbd>
+                </KbdGroup>
+                <span>Navigate</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Kbd>↵</Kbd>
+                <span>Select</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <Kbd>Esc</Kbd>
+              <span>Close</span>
+            </div>
           </div>
-        </SearchContextProvider>
+        </div>
       </DialogContent>
     </Dialog>
   )
@@ -758,187 +531,6 @@ export function SearchModal() {
 ```
 
 ### Search Service
-
-**Location**: `lib/search.ts`
-
-**Purpose**: Functional service following the established patterns in the project for search operations, index loading, and result processing.
-
-```typescript
-import { cache } from 'react'
-import type { SearchIndexItem, SearchResult } from './types/content'
-
-// Lazy-loaded Fuse.js instance
-let fuseInstance: Fuse<SearchIndexItem> | null = null
-let searchIndex: SearchIndexItem[] | null = null
-
-/**
- * Get the search index from static JSON data
- * Uses React cache for request-level memoization
- * Follows the same pattern as other content services
- */
-export const getSearchIndex = cache(async (): Promise<SearchIndexItem[]> => {
-  try {
-    // Dynamic import to avoid loading search index until needed
-    const searchIndexData = await import('@/data/search-index.json')
-    const index = searchIndexData.default as SearchIndexItem[]
-    
-    // Cache the index for subsequent calls
-    searchIndex = index
-    return index
-    
-  } catch (error) {
-    console.error('Error loading search index:', error)
-    return []
-  }
-})
-
-/**
- * Initialize Fuse.js instance with search index
- * Lazy-loaded only when search is first used
- */
-async function initializeFuse(): Promise<Fuse<SearchIndexItem> | null> {
-  if (fuseInstance) {
-    return fuseInstance
-  }
-  
-  try {
-    // Dynamic import to reduce initial bundle size
-    const Fuse = (await import('fuse.js')).default
-    const index = await getSearchIndex()
-    
-    if (index.length === 0) {
-      return null
-    }
-    
-    const fuseOptions = {
-      keys: [
-        { name: 'title', weight: 0.4 },
-        { name: 'description', weight: 0.3 },
-        { name: 'content', weight: 0.2 },
-        { name: 'keywords', weight: 0.1 }
-      ],
-      threshold: 0.4, // Balance between fuzzy and precise matching
-      includeScore: true,
-      includeMatches: true,
-      minMatchCharLength: 2,
-      ignoreLocation: true
-    }
-    
-    fuseInstance = new Fuse(index, fuseOptions)
-    return fuseInstance
-    
-  } catch (error) {
-    console.error('Error initializing Fuse.js:', error)
-    return null
-  }
-}
-
-/**
- * Perform fuzzy search across all content types
- * Returns empty array if search fails or no results found
- */
-export async function searchContent(query: string): Promise<SearchResult[]> {
-  if (!query.trim()) {
-    return []
-  }
-  
-  try {
-    const fuse = await initializeFuse()
-    
-    if (!fuse) {
-      // Fallback to simple string matching if Fuse.js fails
-      return await fallbackSearch(query)
-    }
-    
-    const results = fuse.search(query, { limit: 50 })
-    
-    return results.map(result => ({
-      item: result.item,
-      score: result.score || 0,
-      matches: result.matches || []
-    }))
-    
-  } catch (error) {
-    console.error('Error performing search:', error)
-    return await fallbackSearch(query)
-  }
-}
-
-/**
- * Fallback search using simple string matching
- * Used when Fuse.js fails to initialize or encounters errors
- */
-async function fallbackSearch(query: string): Promise<SearchResult[]> {
-  try {
-    const index = await getSearchIndex()
-    const lowerQuery = query.toLowerCase()
-    
-    const results = index
-      .filter(item => 
-        item.title.toLowerCase().includes(lowerQuery) ||
-        item.description.toLowerCase().includes(lowerQuery) ||
-        item.content.toLowerCase().includes(lowerQuery) ||
-        (item.keywords && item.keywords.some(k => k.toLowerCase().includes(lowerQuery)))
-      )
-      .slice(0, 50)
-      .map(item => ({
-        item,
-        score: 0,
-        matches: []
-      }))
-    
-    return results
-    
-  } catch (error) {
-    console.error('Error in fallback search:', error)
-    return []
-  }
-}
-
-/**
- * Get search suggestions based on partial query
- * Used for autocomplete functionality
- */
-export async function getSearchSuggestions(query: string): Promise<string[]> {
-  if (!query.trim() || query.length < 2) {
-    return []
-  }
-  
-  try {
-    const index = await getSearchIndex()
-    const lowerQuery = query.toLowerCase()
-    
-    const suggestions = new Set<string>()
-    
-    index.forEach(item => {
-      // Extract words from title that start with the query
-      const titleWords = item.title.toLowerCase().split(/\s+/)
-      titleWords.forEach(word => {
-        if (word.startsWith(lowerQuery) && word.length > query.length) {
-          suggestions.add(word)
-        }
-      })
-      
-      // Add keywords that start with the query
-      if (item.keywords) {
-        item.keywords.forEach(keyword => {
-          if (keyword.toLowerCase().startsWith(lowerQuery)) {
-            suggestions.add(keyword)
-          }
-        })
-      }
-    })
-    
-    return Array.from(suggestions).slice(0, 10)
-    
-  } catch (error) {
-    console.error('Error getting search suggestions:', error)
-    return []
-  }
-}
-```
-
-### Global Keyboard Handler
 
 **Location**: `components/search-provider.tsx`
 
@@ -1024,7 +616,7 @@ export function SearchProvider({ children }: SearchProviderProps) {
 
 ```typescript
 import { SearchProvider } from '@/components/search-provider'
-import { SearchModal } from '@/components/search-modal'
+import { SearchModal } from '@/components/search/SearchModal'
 
 export default function RootLayout({
   children,
@@ -1060,7 +652,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from '@/components/ui/input-group'
-import { Kbd, KbdGroup } from '@/components/ui/kbd'
+import { Kbd } from '@/components/ui/kbd'
 import { useSearch } from '@/components/search-provider'
 
 interface SearchButtonProps {
@@ -1075,20 +667,18 @@ export function SearchButton({ className, variant = 'input' }: SearchButtonProps
     return (
       <div className={className}>
         <InputGroup>
-          <InputGroupAddon>
-            <SearchIcon className="h-4 w-4" />
-          </InputGroupAddon>
           <InputGroupInput
             placeholder="Search library..."
             readOnly
             onClick={openSearch}
             className="cursor-pointer"
           />
+          <InputGroupAddon>
+            <SearchIcon className="h-4 w-4" />
+          </InputGroupAddon>
           <InputGroupAddon align="inline-end">
-            <KbdGroup>
-              <Kbd>⌘</Kbd>
-              <Kbd>K</Kbd>
-            </KbdGroup>
+            <Kbd>⌘</Kbd>
+            <Kbd>K</Kbd>
           </InputGroupAddon>
         </InputGroup>
       </div>
@@ -1103,10 +693,7 @@ export function SearchButton({ className, variant = 'input' }: SearchButtonProps
     >
       <SearchIcon className="h-4 w-4 mr-2" />
       Search library...
-      <KbdGroup className="ml-auto">
-        <Kbd>⌘</Kbd>
-        <Kbd>K</Kbd>
-      </KbdGroup>
+      <Kbd className="ml-auto">⌘K</Kbd>
     </Button>
   )
 }
@@ -1162,16 +749,6 @@ export interface SearchIndexItem {
   keywords?: string[]
 }
 
-export interface SearchResult {
-  item: SearchIndexItem
-  score: number
-  matches: Array<{
-    indices: [number, number][]
-    value: string
-    key: string
-  }>
-}
-
 export interface SearchIndex {
   items: SearchIndexItem[]
   metadata: {
@@ -1184,13 +761,7 @@ export interface SearchIndex {
 
 **Transformation Logic**:
 ```typescript
-// scripts/generate-search-index.ts
-import { getAllPrompts } from '@/lib/prompts'
-import { getAllAgents } from '@/lib/agents'
-import { getAllPowers } from '@/lib/powers'
-import { getAllSteering } from '@/lib/steering'
-import { getAllHooks } from '@/lib/hooks'
-
+// scripts/build-search-index.ts
 const transformToSearchItem = (item: ContentItem): SearchIndexItem => ({
   id: item.id,
   type: item.type,
@@ -1358,27 +929,24 @@ Based on the prework analysis, here are the key correctness properties:
 The search system implements comprehensive error handling at multiple levels:
 
 ### Index Loading Errors
-- **Network failures**: Display user-friendly error message with retry option
+- **Network failures**: Display user-friendly error message
 - **Malformed data**: Gracefully skip corrupted entries and continue with valid data
-- **Missing files**: Provide fallback to browse content by category
+- **Missing files**: Create empty search index to prevent build failures
 
 ### Search Processing Errors
-- **Fuse.js initialization failures**: Fall back to simple string matching
+- **Fuse.js initialization failures**: Continue with empty results and log error
 - **Query processing errors**: Log errors and display "Search temporarily unavailable"
-- **Performance timeouts**: Cancel long-running searches and suggest query refinement
 
 ### User Experience Errors
 - **Empty results**: Display "No results found" with suggested alternatives
 - **Partial failures**: Continue functioning with available data
-- **Accessibility failures**: Ensure keyboard navigation always works
 
 ### Error Recovery Strategies
 ```typescript
 const errorRecovery = {
-  indexLoadFailure: () => showBrowseContentFallback(),
-  searchTimeout: () => cancelSearchAndSuggestRefinement(),
-  partialDataFailure: () => continueWithAvailableData(),
-  fuseInitFailure: () => fallbackToSimpleStringSearch()
+  indexLoadFailure: () => createEmptyIndex(),
+  searchTimeout: () => returnEmptyResults(),
+  partialDataFailure: () => continueWithAvailableData()
 }
 ```
 
@@ -1393,8 +961,7 @@ Unit tests will focus on specific examples, edge cases, and integration points:
 - **Event handling**: Test specific keyboard shortcuts and click events
 - **State management**: Test modal open/close state transitions
 - **Error conditions**: Test specific error scenarios (network failures, malformed data)
-- **Accessibility**: Test ARIA attributes, focus management, and screen reader compatibility
-- **Integration**: Test search service integration with Fuse.js and index loading
+- **Integration**: Test search functionality with Fuse.js and index loading
 
 ### Property-Based Tests
 Property-based tests will verify universal properties across all inputs using fast-check:
@@ -1402,8 +969,6 @@ Property-based tests will verify universal properties across all inputs using fa
 - **Search functionality**: Generate random queries and verify results are relevant and properly formatted
 - **Keyboard navigation**: Generate random navigation sequences and verify highlight state consistency
 - **Data integrity**: Generate random content items and verify search index preserves all required fields
-- **Performance**: Generate large datasets and verify search performance remains acceptable
-- **Error handling**: Generate various error conditions and verify graceful handling
 
 ### Testing Configuration
 - **Property tests**: Minimum 100 iterations per test for comprehensive coverage
@@ -1426,4 +991,4 @@ describe('Global Search Properties', () => {
 })
 ```
 
-This comprehensive testing strategy ensures both specific functionality works correctly (unit tests) and universal properties hold across all possible inputs (property tests), providing confidence in the search feature's reliability and correctness.
+This simplified testing strategy ensures both specific functionality works correctly (unit tests) and universal properties hold across all possible inputs (property tests), providing confidence in the search feature's reliability and correctness.
