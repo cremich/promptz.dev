@@ -22,6 +22,12 @@ const config: Config = {
   },
   // Coverage configuration for 100% enforcement
   collectCoverage: true,
+  collectCoverageFrom: [
+    "components/**/*.tsx",
+    "lib/**/*.ts",
+    "!components/ui/**/*",
+    "!lib/types/*.ts",
+  ],
   coverageDirectory: "coverage",
   coverageReporters: [
     "text",
