@@ -27,6 +27,7 @@ Promptz.dev is a comprehensive library and community platform for AI-assisted de
 - **Git integration** providing author attribution, commit history, and content lifecycle tracking
 - **Type-safe content processing** using union types for cross-content operations
 - **Dynamic detail pages** with slug-based routing for all content types
+- **Global search functionality** with fuzzy matching across all content types using Fuse.js
 - **Efficient content discovery** across multiple libraries with static data serving
 - **Community analytics** showing contributor activity, content evolution, and collaboration patterns
 - **Graceful error handling** ensuring platform stability despite missing or corrupted content
@@ -67,6 +68,8 @@ Promptz.dev is a comprehensive library and community platform for AI-assisted de
 - **Dark mode first** with light mode alternative
 - **Progressive loading** with skeleton states and Suspense boundaries
 - **Dynamic content pages** with slug-based routing for detailed content views
+- **Global search modal** with keyboard shortcuts (⌘K/Ctrl+K) for quick content discovery
+- **Fuzzy search** with match highlighting and relevance scoring across all content types
 - **Modular component system** with reusable content display components
 - **Fast static data serving** with pre-generated JSON files for optimal performance
 - **Rich metadata display** including git history, contributor information, and content analytics

@@ -43,7 +43,8 @@ promptz.dev/
 │   ├── hooks.json          # Pre-generated hooks data
 │   ├── powers.json         # Pre-generated powers data
 │   ├── prompts.json        # Pre-generated prompts data
-│   └── steering.json       # Pre-generated steering data
+│   ├── steering.json       # Pre-generated steering data
+│   └── search-index.json   # Pre-generated search index for Fuse.js
 ├── lib/                    # Services and utilities
 │   ├── formatter/          # Formatting utilities
 │   │   ├── date.ts         # Date formatting and comparison
@@ -84,6 +85,7 @@ promptz.dev/
 - **lib/formatter/git.ts**: Git information formatting utilities
 - **lib/formatter/slug.ts**: URL slug generation utilities
 - **lib/library.ts**: Library name extraction utilities
+- **lib/search.ts**: Search utilities, validation, and error handling
 - **lib/{type}.ts**: Type-specific data loading services (prompts.ts, agents.ts, etc.)
 
 ### Build Scripts Structure
@@ -112,6 +114,29 @@ interface BaseContent {
   date: string         // From frontmatter or git commits
   path: string         // File system path
   git?: GitInfo        // Optional git metadata
+}
+
+// Search index types for Fuse.js integration
+interface SearchIndexItem {
+  id: string
+  type: 'prompt' | 'agent' | 'power' | 'steering' | 'hook'
+  title: string
+  description: string
+  content: string
+  author: string
+  date: string
+  library: string
+  path: string
+  keywords?: string[]
+}
+
+interface SearchIndex {
+  items: SearchIndexItem[]
+  metadata: {
+    generatedAt: string
+    totalItems: number
+    itemsByType: Record<string, number>
+  }
 }
 ```
 
@@ -146,6 +171,9 @@ interface BaseContent {
 - **components/ui/card.tsx**: Base card component with variants
 - **components/ui/badge.tsx**: Badge component for tags and categories
 - **components/ui/skeleton.tsx**: Loading skeleton components
+- **components/ui/dialog.tsx**: Modal dialog with overlay and animations
+- **components/ui/input-group.tsx**: Grouped input with addons and buttons
+- **components/ui/kbd.tsx**: Keyboard shortcut display elements
 
 ### Content Components
 - **components/grid.tsx**: Responsive grid with type-safe rendering and skeleton states
@@ -165,6 +193,13 @@ interface BaseContent {
   - **components/content-type-badge.tsx**: Content type indicator badges
   - **components/library-badge.tsx**: Library source indicator badges
   - **components/hook-trigger-badge.tsx**: Hook trigger type display
+- **Search Components** (`components/search/`):
+  - **components/search-provider.tsx**: React context for global search state
+  - **components/search-button.tsx**: Search trigger with keyboard shortcut display
+  - **components/search/search-modal.tsx**: Main search dialog with input and results
+  - **components/search/search-results.tsx**: Result list with match highlighting
+  - **components/search/search-footer.tsx**: Keyboard navigation hints
+  - **components/search/useSearchModal.ts**: Custom hook for search logic and Fuse.js
 
 ### Component Features
 - **Type-safe rendering**: Union type discrimination for content cards
@@ -172,6 +207,7 @@ interface BaseContent {
 - **Responsive design**: Mobile-first with Tailwind breakpoints
 - **Accessibility**: ARIA labels, semantic HTML, keyboard navigation
 - **Dark mode support**: CSS variables and Tailwind dark mode utilities
+- **Global search**: Keyboard-accessible search modal with fuzzy matching
 
 ## Libraries Directory (Git Submodules)
 

@@ -61,6 +61,7 @@
 ## UI Component Dependencies
 
 - **@radix-ui/react-accordion 1.2.12**: Collapsible content sections
+- **@radix-ui/react-dialog 1.1.14**: Modal dialog components for search and overlays
 - **@radix-ui/react-separator 1.1.8**: Visual content dividers
 - **@radix-ui/react-slot 1.2.4**: Primitive component composition
 - **@radix-ui/react-tabs 1.1.13**: Tabbed interface components
@@ -68,6 +69,7 @@
 - **clsx 2.1.1**: Conditional className utility
 - **tailwind-merge 3.4.0**: Tailwind class merging utility
 - **tw-animate-css 1.4.0**: CSS animations for Tailwind
+- **fuse.js 7.1.0**: Fuzzy search library for client-side content search
 
 ## Content Service Architecture
 
@@ -85,6 +87,7 @@
 - **Powers Service** (`lib/powers.ts`): Powers data loading from static JSON
 - **Steering Service** (`lib/steering.ts`): Steering documents data loading from static JSON
 - **Hooks Service** (`lib/hooks.ts`): Hooks data loading from static JSON
+- **Search Service** (`lib/search.ts`): Search utilities, validation, and error handling
 
 ### Key Features
 - **Build-time Processing**: All content processed during build for optimal performance
@@ -109,6 +112,9 @@
 - **Card Component** (`components/ui/card.tsx`): Base card with header, content, footer variants
 - **Badge Component** (`components/ui/badge.tsx`): Status and category indicators
 - **Skeleton Component** (`components/ui/skeleton.tsx`): Loading state placeholders
+- **Dialog Component** (`components/ui/dialog.tsx`): Modal dialogs with overlay and animations
+- **Input Group Component** (`components/ui/input-group.tsx`): Grouped input with addons and buttons
+- **Kbd Component** (`components/ui/kbd.tsx`): Keyboard shortcut display elements
 
 ### Content Components
 - **Grid Component** (`components/grid.tsx`): Responsive grid with type-safe rendering
@@ -125,6 +131,13 @@
   - **Library Badge** (`components/library-badge.tsx`): Library source indicators
   - **Hook Trigger Badge** (`components/hook-trigger-badge.tsx`): Hook trigger type display
 - **Skeleton States**: Loading placeholders for all content types
+- **Search Components**: Global search functionality
+  - **Search Provider** (`components/search-provider.tsx`): React context for search state management
+  - **Search Button** (`components/search-button.tsx`): Trigger button with keyboard shortcut display
+  - **Search Modal** (`components/search/search-modal.tsx`): Main search dialog with input and results
+  - **Search Results** (`components/search/search-results.tsx`): Result display with match highlighting
+  - **Search Footer** (`components/search/search-footer.tsx`): Keyboard navigation hints
+  - **useSearchModal Hook** (`components/search/useSearchModal.ts`): Search logic and Fuse.js integration
 
 ### Component Features
 - **Type-safe Rendering**: Union type discrimination for content cards
