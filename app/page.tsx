@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Grid, GridSkeleton } from "@/components/grid";
+import { SearchButton } from "@/components/search-button";
 import { getLatestPrompts } from "@/lib/prompts";
 import { getLatestSteering } from "@/lib/steering";
 import { getLatestAgents } from "@/lib/agents";
@@ -64,6 +65,12 @@ export default function Home() {
             Discover the latest AI development prompts, custom agents, steering documents, agent hooks, Kiro powers, and resources 
             to enhance your development workflow with Kiro and Amazon Q Developer.
           </p>
+          
+          {/* Search Button */}
+          <div className="w-full max-w-md mb-8">
+            <SearchButton />
+          </div>
+          
           <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
             <Link
               className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-6 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[180px]"

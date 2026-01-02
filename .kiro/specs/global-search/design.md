@@ -657,33 +657,11 @@ import { useSearch } from '@/components/search-provider'
 
 interface SearchButtonProps {
   className?: string
-  variant?: 'default' | 'outline' | 'input'
+  variant?: 'default' | 'outline'
 }
 
-export function SearchButton({ className, variant = 'input' }: SearchButtonProps) {
+export function SearchButton({ className, variant = 'default' }: SearchButtonProps) {
   const { openSearch } = useSearch()
-  
-  if (variant === 'input') {
-    return (
-      <div className={className}>
-        <InputGroup>
-          <InputGroupInput
-            placeholder="Search library..."
-            readOnly
-            onClick={openSearch}
-            className="cursor-pointer"
-          />
-          <InputGroupAddon>
-            <SearchIcon className="h-4 w-4" />
-          </InputGroupAddon>
-          <InputGroupAddon align="inline-end">
-            <Kbd>⌘</Kbd>
-            <Kbd>K</Kbd>
-          </InputGroupAddon>
-        </InputGroup>
-      </div>
-    )
-  }
   
   return (
     <Button
