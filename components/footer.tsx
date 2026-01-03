@@ -129,7 +129,7 @@ export function Footer({ className }: { className?: string }) {
             © {currentYear} Promptz. Open source under MIT License.
           </p>
           <p className="text-xs text-muted-foreground">
-            Made with ❤️ for{' '}
+            Made with Kiro for{' '}
             <a
               href="https://kiro.dev"
               target="_blank"
