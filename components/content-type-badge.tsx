@@ -1,9 +1,5 @@
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import type { VariantProps } from "class-variance-authority"
-import type { badgeVariants } from "@/components/ui/badge"
-
-type BadgeVariant = VariantProps<typeof badgeVariants>["variant"]
 
 interface ContentTypeBadgeProps {
   contentType: string
@@ -11,40 +7,45 @@ interface ContentTypeBadgeProps {
 }
 
 /**
- * Get the appropriate badge variant for content type badges
+ * Get the appropriate styling for content type badges using brand colors
+ * Each content type gets a distinct color from the brand palette
  */
-function getContentTypeBadgeVariant(contentType: string): {
-  variant: BadgeVariant
-  className?: string
-} {
+function getContentTypeStyles(contentType: string): string {
   switch (contentType.toLowerCase()) {
     case 'prompt':
-      return { variant: 'secondary' }
+      // Primary brand color (indigo)
+      return 'bg-[#4F46E5] text-white dark:bg-[#818CF8] dark:text-gray-900 border-transparent'
     case 'agent':
-      return { variant: 'default' }
+      // Secondary brand color (violet)
+      return 'bg-[#7C3AED] text-white dark:bg-[#A78BFA] dark:text-gray-900 border-transparent'
     case 'power':
-      return { variant: 'default' }
+      // Complementary brand color (cyan)
+      return 'bg-[#06B6D4] text-white dark:bg-[#06B6D4] dark:text-gray-900 border-transparent'
     case 'hook':
-      return { variant: 'outline' }
+      // Gradient using primary and secondary
+      return 'bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] text-white dark:from-[#818CF8] dark:to-[#A78BFA] dark:text-gray-900 border-transparent'
     case 'steering':
-      return { variant: 'outline' }
+      // Gradient using secondary and complementary
+      return 'bg-gradient-to-r from-[#7C3AED] to-[#06B6D4] text-white dark:from-[#A78BFA] dark:to-[#06B6D4] dark:text-gray-900 border-transparent'
     default:
-      return { variant: 'secondary' }
+      // Fallback to muted styling
+      return 'bg-muted text-muted-foreground border-transparent'
   }
 }
 
 /**
- * ContentTypeBadge component for displaying content type badges with consistent styling
+ * ContentTypeBadge component for displaying content type badges with brand color styling
+ * Each content type has a distinct color to ensure clear visual separation
  */
 export function ContentTypeBadge({ contentType, className }: ContentTypeBadgeProps) {
-  const badgeConfig = getContentTypeBadgeVariant(contentType)
+  const contentTypeStyles = getContentTypeStyles(contentType)
   
   return (
     <Badge 
-      variant={badgeConfig.variant}
+      variant="secondary" // Use secondary as base, override with custom colors
       className={cn(
         "text-xs font-medium",
-        badgeConfig.className,
+        contentTypeStyles,
         className
       )}
     >

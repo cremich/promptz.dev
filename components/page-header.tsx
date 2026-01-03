@@ -1,13 +1,17 @@
 import { ReactNode } from 'react'
 import { PixelParticles } from '@/components/animations/pixel-particles'
+import { Badge } from '@/components/ui/badge'
+import { Info } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface PageHeaderProps {
   title: ReactNode
   description: string
   children?: ReactNode
+  showLibraryLegend?: boolean
 }
 
-export function PageHeader({ title, description, children }: PageHeaderProps) {
+export function PageHeader({ title, description, children, showLibraryLegend = false }: PageHeaderProps) {
   return (
     <section className="relative overflow-hidden border-b border-border/40">
       {/* Gradient background */}
@@ -29,11 +33,54 @@ export function PageHeader({ title, description, children }: PageHeaderProps) {
             {description}
           </p>
 
+          {/* Library Legend */}
+          {showLibraryLegend && <LibraryLegend />}
+
           {/* Optional children (e.g., filters, nav) */}
           {children && <div className="mt-6">{children}</div>}
         </div>
       </div>
     </section>
+  )
+}
+
+/**
+ * LibraryLegend component that explains the different library badge types
+ */
+function LibraryLegend() {
+  return (
+    <div className="mt-4 flex items-start gap-2 rounded-lg border border-border/50 bg-muted/30 p-3">
+      <Info className="mt-0.5 h-4 w-4 text-muted-foreground flex-shrink-0" />
+      <div className="space-y-2 text-sm">
+        <p className="font-medium text-foreground">Library Sources:</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Badge 
+              variant="outline"
+              className={cn(
+                "text-xs font-medium",
+                "border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300"
+              )}
+            >
+              kiro-powers
+            </Badge>
+            <span className="text-muted-foreground">Official Kiro library</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge 
+              variant="outline"
+              className={cn(
+                "text-xs font-medium",
+                "border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300"
+              )}
+            >
+              promptz
+            </Badge>
+            <span className="text-muted-foreground">Community library</span>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
