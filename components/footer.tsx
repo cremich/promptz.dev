@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { cn } from '@/lib/utils'
 
 const footerLinks = {
   resources: [
@@ -31,11 +32,11 @@ function GitHubIcon({ className }: { className?: string }) {
   )
 }
 
-export function Footer() {
+export function Footer({ className }: { className?: string }) {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-border/40 bg-card/30">
+    <footer className={cn('border-t border-border/40 bg-card/30', className)}>
       <div className="container mx-auto max-w-7xl px-6 py-12">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}

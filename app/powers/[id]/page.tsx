@@ -1,122 +1,133 @@
-import { Suspense } from "react";
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ContentHeader } from "@/components/content-header";
-import { ContributorInfo } from "@/components/contributor-info";
-import { Keywords } from "@/components/keywords";
-import { getPowerById, getAllPowers } from "@/lib/powers";
-import { idToSlug, slugToId, isValidSlug } from "@/lib/formatter/slug";
-import { getLibraryName } from "@/lib/library";
-import type { Power } from "@/lib/types/content";
+import { Suspense } from 'react'
+import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { ContentHeader } from '@/components/content-header'
+import { ContributorInfo } from '@/components/contributor-info'
+import { Keywords } from '@/components/keywords'
+import { DetailLayout, DetailSkeleton } from '@/components/detail-layout'
+import { getPowerById, getAllPowers } from '@/lib/powers'
+import { idToSlug, slugToId, isValidSlug } from '@/lib/formatter/slug'
+import { getLibraryName } from '@/lib/library'
+import type { Power } from '@/lib/types/content'
 
 interface PowerDetailPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }
 
 export async function generateStaticParams() {
   try {
-    const powers = await getAllPowers();
+    const powers = await getAllPowers()
     return powers.map((power) => ({
       id: idToSlug(power.id),
-    }));
+    }))
   } catch (error) {
-    console.error('Error generating static params:', error);
-    return [];
+    console.error('Error generating static params:', error)
+    return []
   }
 }
 
-export async function generateMetadata({ params }: PowerDetailPageProps): Promise<Metadata> {
-  const { id: slug } = await params;
-  
+export async function generateMetadata({
+  params,
+}: PowerDetailPageProps): Promise<Metadata> {
+  const { id: slug } = await params
+
   if (!isValidSlug(slug)) {
     return {
-      title: "Invalid Power URL | Promptz.dev",
-      description: "The requested power URL is not valid.",
-    };
+      title: 'Invalid Power URL | Promptz.dev',
+      description: 'The requested power URL is not valid.',
+    }
   }
-  
-  const id = slugToId(slug);
-  const power = await getPowerById(id);
+
+  const id = slugToId(slug)
+  const power = await getPowerById(id)
 
   if (!power) {
     return {
-      title: "Power Not Found | Promptz.dev",
-      description: "The requested power could not be found.",
-    };
+      title: 'Power Not Found | Promptz.dev',
+      description: 'The requested power could not be found.',
+    }
   }
 
-  const libraryName = getLibraryName(power.path);
-  const author = power.git?.author || power.author;
-  
+  const libraryName = getLibraryName(power.path)
+  const author = power.git?.author || power.author
+
   return {
     title: `${power.displayName || power.title} | Promptz.dev`,
     description: `Kiro power by ${author} from ${libraryName} library. ${power.description}`,
     keywords: [
-      "Kiro power",
-      "AI development",
-      "development tools",
+      'Kiro power',
+      'AI development',
+      'development tools',
       ...power.keywords,
       libraryName,
       author,
-      "Kiro",
-      "Amazon Q Developer"
+      'Kiro',
+      'Amazon Q Developer',
     ],
     authors: [{ name: author }],
     openGraph: {
       title: `${power.displayName || power.title} | Promptz.dev`,
       description: `Kiro power by ${author} from ${libraryName} library. ${power.description}`,
-      type: "article",
+      type: 'article',
       authors: [author],
       publishedTime: power.git?.createdDate || power.date,
       modifiedTime: power.git?.lastModifiedDate,
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title: `${power.displayName || power.title} | Promptz.dev`,
       description: `Kiro power by ${author} from ${libraryName} library. ${power.description}`,
     },
-  };
+  }
 }
 
-async function loadSteeringFileContent(power: Power, filename: string): Promise<string> {
+async function loadSteeringFileContent(
+  power: Power,
+  filename: string
+): Promise<string> {
   try {
-    const powerDir = power.path.replace('/POWER.md', '');
-    const steeringFilePath = `${powerDir}/steering/${filename}`;
-    const fs = await import('fs');
-    const content = await fs.promises.readFile(steeringFilePath, 'utf-8');
-    return content;
+    const powerDir = power.path.replace('/POWER.md', '')
+    const steeringFilePath = `${powerDir}/steering/${filename}`
+    const fs = await import('fs')
+    const content = await fs.promises.readFile(steeringFilePath, 'utf-8')
+    return content
   } catch (error) {
-    console.warn(`Failed to load steering file: ${filename}`, error);
-    return `Failed to load content for ${filename}`;
+    console.warn(`Failed to load steering file: ${filename}`, error)
+    return `Failed to load content for ${filename}`
   }
 }
 
-async function loadAllSteeringFiles(power: Power): Promise<Array<{ filename: string; content: string }>> {
+async function loadAllSteeringFiles(
+  power: Power
+): Promise<Array<{ filename: string; content: string }>> {
   if (!power.steeringFiles || power.steeringFiles.length === 0) {
-    return [];
+    return []
   }
-  
+
   const steeringContents = await Promise.all(
     power.steeringFiles.map(async (filename) => ({
       filename,
-      content: await loadSteeringFileContent(power, filename)
+      content: await loadSteeringFileContent(power, filename),
     }))
-  );
-  
-  return steeringContents;
+  )
+
+  return steeringContents
 }
 
-function PowerContentTabs({ 
-  power, 
-  steeringContents 
-}: { 
-  power: Power; 
-  steeringContents: Array<{ filename: string; content: string }> 
+function PowerContentTabs({
+  power,
+  steeringContents,
+}: {
+  power: Power
+  steeringContents: Array<{ filename: string; content: string }>
 }) {
   return (
     <Card className="border-border/40 bg-card/50">
@@ -134,21 +145,25 @@ function PowerContentTabs({
               Steering Files
             </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="prompt" className="mt-6">
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground">POWER.md</h3>
-              <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                POWER.md
+              </h3>
+              <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm font-mono">
                 {power.content}
               </pre>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="configuration" className="mt-6">
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground">mcp.json</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">
+                mcp.json
+              </h3>
               {power.mcpConfig ? (
-                <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
+                <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm font-mono">
                   {JSON.stringify(power.mcpConfig, null, 2)}
                 </pre>
               ) : (
@@ -158,10 +173,12 @@ function PowerContentTabs({
               )}
             </div>
           </TabsContent>
-          
+
           <TabsContent value="steering" className="mt-6">
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Steering Files</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Steering Files
+              </h3>
               {steeringContents.length > 0 ? (
                 <Accordion type="single" collapsible className="w-full">
                   {steeringContents.map((steeringFile, index) => (
@@ -170,7 +187,7 @@ function PowerContentTabs({
                         {steeringFile.filename}
                       </AccordionTrigger>
                       <AccordionContent>
-                        <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
+                        <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm font-mono">
                           {steeringFile.content}
                         </pre>
                       </AccordionContent>
@@ -187,68 +204,48 @@ function PowerContentTabs({
         </Tabs>
       </CardContent>
     </Card>
-  );
-}
-
-function DetailSkeleton() {
-  return (
-    <section className="container mx-auto max-w-4xl px-6 py-12">
-      <div className="animate-pulse space-y-8">
-        <div className="h-5 w-24 rounded bg-muted" />
-        <div className="h-10 w-3/4 rounded bg-muted" />
-        <div className="h-24 rounded bg-muted" />
-        <div className="h-64 rounded bg-muted" />
-      </div>
-    </section>
-  );
+  )
 }
 
 async function PowerDetail({ slug }: { slug: string }) {
   if (!isValidSlug(slug)) {
-    notFound();
+    notFound()
   }
-  
-  const id = slugToId(slug);
-  const power = await getPowerById(id);
+
+  const id = slugToId(slug)
+  const power = await getPowerById(id)
 
   if (!power) {
-    notFound();
+    notFound()
   }
 
-  const steeringContents = await loadAllSteeringFiles(power);
+  const steeringContents = await loadAllSteeringFiles(power)
 
   return (
-    <section className="container mx-auto max-w-4xl px-6 py-12">
-      {/* Back Link */}
-      <Link
-        href="/powers"
-        className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Powers
-      </Link>
-
+    <DetailLayout backHref="/powers" backLabel="Back to Powers">
       {/* Header */}
       <ContentHeader content={power} />
-      
+
       {/* Keywords */}
-      <Keywords keywords={power.keywords} />
+      <Keywords keywords={power.keywords} className="mb-6" />
 
       {/* Contributor Information */}
       <ContributorInfo content={power} />
 
       {/* Power Content Tabs */}
       <PowerContentTabs power={power} steeringContents={steeringContents} />
-    </section>
-  );
+    </DetailLayout>
+  )
 }
 
-export default async function PowerDetailPage({ params }: PowerDetailPageProps) {
-  const { id: slug } = await params;
+export default async function PowerDetailPage({
+  params,
+}: PowerDetailPageProps) {
+  const { id: slug } = await params
 
   return (
     <Suspense fallback={<DetailSkeleton />}>
       <PowerDetail slug={slug} />
     </Suspense>
-  );
+  )
 }

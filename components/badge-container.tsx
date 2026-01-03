@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 
 interface BadgeContainerProps {
   children: ReactNode
-  context?: 'card-header' | 'card-footer' | 'list-item' | 'default'
+  context?: 'card-header' | 'card-footer' | 'list-item' | 'detail-header' | 'default'
   className?: string
   maxBadges?: number
 }
@@ -11,7 +11,7 @@ interface BadgeContainerProps {
 /**
  * Get badge arrangement configuration for different display contexts
  */
-function getBadgeArrangement(context: 'card-header' | 'card-footer' | 'list-item' | 'default') {
+function getBadgeArrangement(context: 'card-header' | 'card-footer' | 'list-item' | 'detail-header' | 'default') {
   switch (context) {
     case 'card-header':
       return {
@@ -27,6 +27,11 @@ function getBadgeArrangement(context: 'card-header' | 'card-footer' | 'list-item
       return {
         containerClasses: 'flex gap-1',
         maxBadges: 4
+      }
+    case 'detail-header':
+      return {
+        containerClasses: 'flex flex-wrap gap-2',
+        maxBadges: 5
       }
     case 'default':
     default:

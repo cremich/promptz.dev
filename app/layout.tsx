@@ -57,9 +57,9 @@ export default function RootLayout({
         <SearchProvider>
           <div className="flex min-h-screen flex-col bg-background font-sans">
             <Navigation />
-            <main className="flex-1">{children}</main>
+            <main className="flex flex-1 flex-col">{children}</main>
             <Suspense fallback={null}>
-              <Footer />
+              <Footer className="mt-auto" />
             </Suspense>
           </div>
           <SearchModal />

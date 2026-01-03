@@ -1,71 +1,68 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { GitHubLink } from "@/components/github-link";
-import { ContentDate } from "@/components/content-date";
-import type { ContentItem } from "@/lib/types/content";
+import { User, Calendar, GitCommit, Clock } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { GitHubLink } from '@/components/github-link'
+import { ContentDate } from '@/components/content-date'
+import type { ContentItem } from '@/lib/types/content'
 
 interface ContributorInfoProps {
-  content: ContentItem;
+  content: ContentItem
 }
 
 function getShortHash(fullHash: string): string {
-  return fullHash.substring(0, 7);
+  return fullHash.substring(0, 7)
 }
 
 export function ContributorInfo({ content }: ContributorInfoProps) {
-  const displayAuthor = content.git?.author || content.author;
+  const displayAuthor = content.git?.author || content.author
 
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle className="text-xl">Contributor Information</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-1">Author</h3>
-            <p className="text-sm">
-              {displayAuthor}
-            </p>
-          </div>
-          
-          <div>
-            <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-1">Created</h3>
-            <ContentDate 
-              content={content} 
-              variant="detail" 
-            />
-          </div>
-          
-          {content.git?.lastModifiedDate && (
-            <div>
-              <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-1">Last Modified</h3>
-              <ContentDate 
-                content={{ 
-                  ...content, 
-                  git: { ...content.git, createdDate: content.git.lastModifiedDate } 
-                }} 
-                variant="detail" 
-              />
+    <Card className="mb-8 border-border/40 bg-card/50">
+      <CardContent>
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          {/* Metadata grid */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted-foreground">
+            {/* Author */}
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span>{displayAuthor}</span>
             </div>
-          )}
-          
-          {content.git?.commitHash && (
-            <div>
-              <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-1">Latest Commit</h3>
-              <p className="text-sm font-mono">
-                {getShortHash(content.git.commitHash)}
-              </p>
+
+            {/* Created date */}
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <ContentDate content={content} variant="detail" />
             </div>
-          )}
-        </div>
-        
-        <Separator />
-        
-        <div>
+
+            {/* Last modified */}
+            {content.git?.lastModifiedDate && (
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                <span>Updated </span>
+                <ContentDate
+                  content={{
+                    ...content,
+                    git: { ...content.git, createdDate: content.git.lastModifiedDate },
+                  }}
+                  variant="detail"
+                />
+              </div>
+            )}
+
+            {/* Commit hash */}
+            {content.git?.commitHash && (
+              <div className="flex items-center gap-2">
+                <GitCommit className="h-4 w-4" />
+                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+                  {getShortHash(content.git.commitHash)}
+                </code>
+              </div>
+            )}
+          </div>
+
+          {/* GitHub link */}
           <GitHubLink content={content} />
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
