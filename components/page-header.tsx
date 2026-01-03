@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { PixelParticles } from '@/components/pixel-particles'
+import { PixelParticles } from '@/components/animations/pixel-particles'
 
 interface PageHeaderProps {
   title: ReactNode

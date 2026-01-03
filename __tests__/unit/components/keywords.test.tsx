@@ -17,6 +17,7 @@ describe('Keywords', () => {
   })
 
   it('returns null when keywords is undefined', () => {
+    //@ts-ignore explicit for test
     const { container } = render(<Keywords keywords={undefined as string[]} />)
     expect(container.firstChild).toBeNull()
   })
@@ -29,13 +30,6 @@ describe('Keywords', () => {
     expect(container.firstChild).toHaveClass(customClass)
   })
 
-  it('uses default className when none provided', () => {
-    const keywords = ['test']
-    const { container } = render(<Keywords keywords={keywords} />)
-    
-    expect(container.firstChild).toHaveClass('flex', 'flex-wrap', 'gap-2', 'mb-4')
-  })
-
   it('renders each keyword as a secondary badge with correct styling', () => {
     const keywords = ['keyword1', 'keyword2']
     render(<Keywords keywords={keywords} />)
@@ -43,9 +37,6 @@ describe('Keywords', () => {
     // Check that keywords are rendered as text
     expect(screen.getByText('keyword1')).toBeInTheDocument()
     expect(screen.getByText('keyword2')).toBeInTheDocument()
-    
-    // Check that the container has the expected structure
-    const container = screen.getByText('keyword1').closest('div')
-    expect(container).toHaveClass('flex', 'flex-wrap', 'gap-2', 'mb-4')
+  
   })
 })

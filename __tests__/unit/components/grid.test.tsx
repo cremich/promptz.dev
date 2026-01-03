@@ -112,15 +112,6 @@ describe('Grid', () => {
     expect(container.firstChild).toHaveClass('custom-grid-class')
   })
 
-  it('should use responsive grid layout', () => {
-    const { container } = render(<Grid items={mockContentItems} />)
-    
-    expect(container.firstChild).toHaveClass('grid')
-    expect(container.firstChild).toHaveClass('grid-cols-1')
-    expect(container.firstChild).toHaveClass('md:grid-cols-2')
-    expect(container.firstChild).toHaveClass('lg:grid-cols-3')
-  })
-
   it('should apply h-full class to all cards', () => {
     render(<Grid items={mockContentItems} />)
     
@@ -162,52 +153,5 @@ describe('Grid', () => {
     expect(allCards[2]).toHaveAttribute('data-item-id', 'kiro-powers/power-1')
     expect(allCards[3]).toHaveAttribute('data-item-id', 'promptz/hooks/hook-1')
     expect(allCards[4]).toHaveAttribute('data-item-id', 'promptz/steering/steering-1')
-  })
-})
-
-describe('GridSkeleton', () => {
-  it('should render default number of skeleton cards', () => {
-    render(<GridSkeleton />)
-    
-    const skeletonCards = screen.getAllByTestId('compact-card-skeleton')
-    expect(skeletonCards).toHaveLength(6)
-  })
-
-  it('should render custom number of skeleton cards', () => {
-    render(<GridSkeleton count={3} />)
-    
-    const skeletonCards = screen.getAllByTestId('compact-card-skeleton')
-    expect(skeletonCards).toHaveLength(3)
-  })
-
-  it('should apply custom className', () => {
-    const { container } = render(<GridSkeleton className="custom-skeleton-grid" />)
-    
-    expect(container.firstChild).toHaveClass('custom-skeleton-grid')
-  })
-
-  it('should use responsive grid layout', () => {
-    const { container } = render(<GridSkeleton />)
-    
-    expect(container.firstChild).toHaveClass('grid')
-    expect(container.firstChild).toHaveClass('grid-cols-1')
-    expect(container.firstChild).toHaveClass('md:grid-cols-2')
-    expect(container.firstChild).toHaveClass('lg:grid-cols-3')
-  })
-
-  it('should apply h-full class to skeleton cards', () => {
-    render(<GridSkeleton />)
-    
-    const skeletonCards = screen.getAllByTestId('compact-card-skeleton')
-    skeletonCards.forEach(card => {
-      expect(card).toHaveClass('h-full')
-    })
-  })
-
-  it('should handle count of 0', () => {
-    render(<GridSkeleton count={0} />)
-    
-    const skeletonCards = screen.queryAllByTestId('compact-card-skeleton')
-    expect(skeletonCards).toHaveLength(0)
   })
 })

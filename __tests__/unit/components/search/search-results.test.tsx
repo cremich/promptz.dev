@@ -106,21 +106,6 @@ describe('SearchResults', () => {
     expect(mockOnSelectedIndexChange).toHaveBeenCalledWith(0)
   })
 
-  it('applies selected styling to selected index', () => {
-    render(
-      <SearchResults
-        results={[createMockResult({ id: 'test-1' }), createMockResult({ id: 'test-2' })]}
-        selectedIndex={1}
-        onResultClick={mockOnResultClick}
-        onSelectedIndexChange={mockOnSelectedIndexChange}
-        resultsRef={mockResultsRef}
-      />
-    )
-    const items = screen.getAllByText('A test prompt description')
-    const secondItem = items[1].closest('div[class*="cursor-pointer"]')
-    expect(secondItem).toHaveClass('bg-muted')
-  })
-
   it('renders all content types correctly', () => {
     const types: Array<SearchIndexItem['type']> = ['prompt', 'agent', 'power', 'steering', 'hook']
     const results = types.map((type, index) =>

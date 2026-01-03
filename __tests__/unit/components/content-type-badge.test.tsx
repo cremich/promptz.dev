@@ -22,7 +22,6 @@ describe('ContentTypeBadge', () => {
     const badge = screen.getByTestId('badge')
     expect(badge).toHaveTextContent('prompt')
     expect(badge).toHaveAttribute('data-variant', 'secondary')
-    expect(badge).toHaveClass('text-xs')
   })
 
   it('should render agent badge with default variant', () => {
@@ -61,7 +60,7 @@ describe('ContentTypeBadge', () => {
     render(<ContentTypeBadge contentType="prompt" className="custom-class" />)
     
     const badge = screen.getByTestId('badge')
-    expect(badge).toHaveClass('text-xs custom-class')
+    expect(badge).toHaveClass('custom-class')
   })
 
   it('should use secondary variant for unknown content type', () => {

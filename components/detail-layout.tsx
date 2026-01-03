@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PixelParticles } from '@/components/pixel-particles'
+import { PixelParticles } from '@/components/animations/pixel-particles'
 
 interface DetailLayoutProps {
   backHref: string

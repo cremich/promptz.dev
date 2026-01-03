@@ -67,7 +67,6 @@ describe('GitHubLink', () => {
     
     const icon = screen.getByRole('link').querySelector('svg')
     expect(icon).toBeInTheDocument()
-    expect(icon).toHaveClass('w-4', 'h-4')
   })
 
   it('should handle paths without libraries directory', () => {

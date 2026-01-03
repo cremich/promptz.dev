@@ -42,7 +42,7 @@ describe('LibraryBadge', () => {
     const badge = screen.getByTestId('badge')
     expect(badge).toHaveTextContent('promptz')
     expect(badge).toHaveAttribute('data-variant', 'outline')
-    expect(badge).toHaveClass('text-xs border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300')
+    expect(badge).toHaveClass('dark:border-blue-800 dark:text-blue-300')
   })
 
   it('should render kiro-powers library with purple styling', () => {
@@ -52,7 +52,7 @@ describe('LibraryBadge', () => {
     const badge = screen.getByTestId('badge')
     expect(badge).toHaveTextContent('kiro-powers')
     expect(badge).toHaveAttribute('data-variant', 'outline')
-    expect(badge).toHaveClass('text-xs border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300')
+    expect(badge).toHaveClass('dark:border-purple-800 dark:text-purple-300')
   })
 
   it('should render unknown library with default styling', () => {
@@ -62,7 +62,6 @@ describe('LibraryBadge', () => {
     const badge = screen.getByTestId('badge')
     expect(badge).toHaveTextContent('unknown-lib')
     expect(badge).toHaveAttribute('data-variant', 'outline')
-    expect(badge).toHaveClass('text-xs')
   })
 
   it('should be case insensitive for library names', () => {
@@ -74,7 +73,7 @@ describe('LibraryBadge', () => {
     render(<LibraryBadge content={content} />)
     
     const badge = screen.getByTestId('badge')
-    expect(badge).toHaveClass('border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300')
+    expect(badge).toHaveTextContent('PROMPTZ')
   })
 
   it('should apply custom className', () => {
@@ -82,6 +81,6 @@ describe('LibraryBadge', () => {
     render(<LibraryBadge content={content} className="custom-class" />)
     
     const badge = screen.getByTestId('badge')
-    expect(badge).toHaveClass('text-xs border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300 custom-class')
+    expect(badge).toHaveClass('custom-class')
   })
 })

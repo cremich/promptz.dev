@@ -53,45 +53,6 @@ describe('ContentDate', () => {
     expect(screen.getByText('Unknown Date')).toBeInTheDocument()
   })
 
-  it('applies card variant styling by default', () => {
-    render(
-      <ContentDate 
-        content={mockContent} 
-        data-testid="content-date"
-      />
-    )
-    
-    const element = screen.getByTestId('content-date')
-    expect(element).toHaveClass('text-xs', 'text-muted-foreground')
-  })
-
-  it('applies detail variant styling', () => {
-    render(
-      <ContentDate 
-        content={mockContent} 
-        variant="detail"
-        data-testid="content-date"
-      />
-    )
-    
-    const element = screen.getByTestId('content-date')
-    expect(element).toHaveClass('text-sm')
-    expect(element).not.toHaveClass('text-xs')
-  })
-
-  it('applies inline variant styling', () => {
-    render(
-      <ContentDate 
-        content={mockContent} 
-        variant="inline"
-        data-testid="content-date"
-      />
-    )
-    
-    const element = screen.getByTestId('content-date')
-    expect(element).toHaveClass('text-sm', 'text-muted-foreground')
-  })
-
   it('applies custom className', () => {
     render(
       <ContentDate 

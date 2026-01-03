@@ -41,10 +41,8 @@ describe('ContributorInfo', () => {
   it('should render basic contributor information', () => {
     render(<ContributorInfo content={mockAgent} />)
     
-    expect(screen.getByText('Contributor Information')).toBeInTheDocument()
-    expect(screen.getByText('Author')).toBeInTheDocument()
+    // Component displays author name directly without label
     expect(screen.getByText('Test Author')).toBeInTheDocument()
-    expect(screen.getByText('Created')).toBeInTheDocument()
   })
 
   it('should render git information when available', () => {
@@ -62,18 +60,20 @@ describe('ContributorInfo', () => {
 
     render(<ContributorInfo content={agentWithGit} />)
     
+    // Git author is displayed
     expect(screen.getByText('Git Author')).toBeInTheDocument()
-    expect(screen.getByText('Last Modified')).toBeInTheDocument()
-    expect(screen.getByText('Latest Commit')).toBeInTheDocument()
-    expect(screen.getByText('abc123d')).toBeInTheDocument() // Short hash
+    // Updated label is shown for last modified
+    expect(screen.getByText('Updated')).toBeInTheDocument()
+    // Short hash is displayed
+    expect(screen.getByText('abc123d')).toBeInTheDocument()
   })
 
   it('should fallback to frontmatter data when git info is not available', () => {
     render(<ContributorInfo content={mockAgent} />)
     
     expect(screen.getByText('Test Author')).toBeInTheDocument()
-    expect(screen.queryByText('Last Modified')).not.toBeInTheDocument()
-    expect(screen.queryByText('Latest Commit')).not.toBeInTheDocument()
+    // No "Updated" text when no lastModifiedDate
+    expect(screen.queryByText('Updated')).not.toBeInTheDocument()
   })
 
   it('should render GitHub link', () => {
@@ -100,7 +100,8 @@ describe('ContributorInfo', () => {
 
     render(<ContributorInfo content={agentWithPartialGit} />)
     
-    expect(screen.queryByText('Last Modified')).not.toBeInTheDocument()
+    // No "Updated" text when lastModifiedDate is empty
+    expect(screen.queryByText('Updated')).not.toBeInTheDocument()
   })
 
   it('should not render commit hash when not available', () => {
@@ -118,6 +119,8 @@ describe('ContributorInfo', () => {
 
     render(<ContributorInfo content={agentWithoutCommitHash} />)
     
-    expect(screen.queryByText('Latest Commit')).not.toBeInTheDocument()
+    // No commit hash code element when commitHash is empty
+    const codeElements = screen.queryAllByRole('code')
+    expect(codeElements.length).toBe(0)
   })
 })

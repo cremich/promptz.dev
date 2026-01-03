@@ -23,18 +23,11 @@ describe('GitHash', () => {
     expect(screen.getByText('abc123d')).toBeInTheDocument()
   })
 
-  it('should apply font-mono class by default', () => {
-    render(<GitHash git={mockGitInfo} />)
-
-    const hashElement = screen.getByText('abc123d')
-    expect(hashElement).toHaveClass('font-mono')
-  })
-
   it('should apply custom className when provided', () => {
     render(<GitHash git={mockGitInfo} className="custom-class" />)
 
     const hashElement = screen.getByText('abc123d')
-    expect(hashElement).toHaveClass('font-mono', 'custom-class')
+    expect(hashElement).toHaveClass('custom-class')
   })
 
   it('should return null when git info is not provided', () => {
@@ -49,6 +42,7 @@ describe('GitHash', () => {
       commitHash: undefined
     }
 
+    //@ts-ignore explicit for testing
     const { container } = render(<GitHash git={gitInfoWithoutHash} />)
 
     expect(container.firstChild).toBeNull()

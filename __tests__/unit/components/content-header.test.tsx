@@ -58,10 +58,39 @@ describe('ContentHeader', () => {
     expect(screen.queryByText('A test agent for testing purposes')).not.toBeInTheDocument()
   })
 
-  it('should render content ID', () => {
-    render(<ContentHeader content={mockAgent} />)
+  it('should render power displayName when available', () => {
+    const mockPower = {
+      id: 'test-power',
+      type: 'power' as const,
+      title: 'Test Power',
+      displayName: 'Test Power Display Name',
+      author: 'Test Author',
+      date: '2024-01-01',
+      path: 'libraries/test-lib/powers/test-power',
+      description: 'A test power',
+      keywords: ['test'],
+      content: 'Test content'
+    }
+    render(<ContentHeader content={mockPower} />)
     
-    expect(screen.getByText('ID:')).toBeInTheDocument()
-    expect(screen.getByText('test-agent')).toBeInTheDocument()
+    expect(screen.getByText('Test Power Display Name')).toBeInTheDocument()
+  })
+
+  it('should render power title when displayName is not available', () => {
+    const mockPower = {
+      id: 'test-power',
+      type: 'power' as const,
+      title: 'Test Power Title',
+      author: 'Test Author',
+      date: '2024-01-01',
+      path: 'libraries/test-lib/powers/test-power',
+      description: 'A test power',
+      keywords: ['test'],
+      content: 'Test content'
+    }
+    //@ts-ignore
+    render(<ContentHeader content={mockPower} />) 
+    
+    expect(screen.getByText('Test Power Title')).toBeInTheDocument()
   })
 })

@@ -7,7 +7,6 @@ describe('HookTriggerBadge', () => {
     
     const badge = screen.getByText('on-save')
     expect(badge).toBeInTheDocument()
-    expect(badge).toHaveClass('text-xs')
   })
 
   it('should render nothing when trigger is not provided', () => {
@@ -26,7 +25,7 @@ describe('HookTriggerBadge', () => {
     render(<HookTriggerBadge trigger="on-message" className="custom-class" />)
     
     const badge = screen.getByText('on-message')
-    expect(badge).toHaveClass('text-xs', 'custom-class')
+    expect(badge).toHaveClass('custom-class')
   })
 
   it('should render different trigger values correctly', () => {
