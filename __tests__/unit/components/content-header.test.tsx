@@ -88,7 +88,7 @@ describe('ContentHeader', () => {
       keywords: ['test'],
       content: 'Test content'
     }
-    //@ts-ignore
+    //@ts-expect-error: explicit for test
     render(<ContentHeader content={mockPower} />) 
     
     expect(screen.getByText('Test Power Title')).toBeInTheDocument()

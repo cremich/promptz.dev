@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { CompactCard, CompactCardSkeleton } from '@/components/compact-card'
+import { CompactCard } from '@/components/compact-card'
 import type { Prompt, Agent, Power, SteeringDocument, Hook } from '@/lib/types/content'
 
 // Mock next/link

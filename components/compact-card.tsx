@@ -50,17 +50,9 @@ function getItemTitle(item: ContentItem): string {
   return item.title
 }
 
-function getItemDescription(item: ContentItem): string | undefined {
-  if (item.type === 'agent' || item.type === 'power' || item.type === 'hook') {
-    return item.description
-  }
-  return undefined
-}
-
 export function CompactCard({ item, className }: CompactCardProps) {
   const config = typeConfig[item.type]
   const title = getItemTitle(item)
-  const description = getItemDescription(item)
   const displayAuthor = item.git?.author || item.author
 
   return (

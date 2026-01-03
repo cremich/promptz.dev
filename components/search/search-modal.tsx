@@ -10,7 +10,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from '@/components/ui/input-group'
-import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { useSearch } from '@/components/search-provider'
 import {
   SearchResults,

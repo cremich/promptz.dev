@@ -42,7 +42,7 @@ describe('GitHash', () => {
       commitHash: undefined
     }
 
-    //@ts-ignore explicit for testing
+    //@ts-expect-error: explicit for test
     const { container } = render(<GitHash git={gitInfoWithoutHash} />)
 
     expect(container.firstChild).toBeNull()

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { Grid, GridSkeleton } from '@/components/grid'
+import { Grid } from '@/components/grid'
 import type { ContentItem } from '@/lib/types/content'
 
 // Mock the CompactCard component

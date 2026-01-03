@@ -17,7 +17,7 @@ describe('Keywords', () => {
   })
 
   it('returns null when keywords is undefined', () => {
-    //@ts-ignore explicit for test
+    //@ts-expect-error: explicit for test
     const { container } = render(<Keywords keywords={undefined as string[]} />)
     expect(container.firstChild).toBeNull()
   })
