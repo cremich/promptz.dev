@@ -45,7 +45,7 @@ export async function extractGitFileInfo(filePath: string): Promise<GitFileInfo 
     // Get git log for this specific file
     const log: LogResult = await git.log({
       file: relativePath,
-      maxCount: 100 // Get more history to find creation
+      maxCount: 1000 // Get extensive history to find true creation
     })
     
     if (!log.all || log.all.length === 0) {
@@ -60,12 +60,12 @@ export async function extractGitFileInfo(filePath: string): Promise<GitFileInfo 
     const oldestCommit = log.all[log.all.length - 1]
     
     return {
-      author: latestCommit.author_name,
-      authorEmail: latestCommit.author_email,
+      author: oldestCommit.author_name, // Use original author for creation
+      authorEmail: oldestCommit.author_email,
       createdDate: oldestCommit.date,
       lastModifiedDate: latestCommit.date,
-      commitHash: latestCommit.hash,
-      commitMessage: latestCommit.message
+      commitHash: oldestCommit.hash, // Use original commit hash
+      commitMessage: oldestCommit.message
     }
   } catch (error) {
     console.warn(`Failed to extract git info for ${filePath}:`, error)
@@ -107,8 +107,19 @@ async function isCommitRelevantToDirectory(git: SimpleGit, commitHash: string, r
   try {
     const files = await git.show([commitHash, '--name-only', '--format='])
     const fileList = files.split('\n').filter(f => f.trim())
-    return fileList.some(file => file.startsWith(relativePath))
-  } catch {
+    
+    // Check if any file in the commit is within the directory
+    const isRelevant = fileList.some(file => {
+      // Normalize paths for comparison
+      const normalizedFile = file.replace(/\\/g, '/')
+      const normalizedPath = relativePath.replace(/\\/g, '/')
+      
+      return normalizedFile.startsWith(normalizedPath + '/') || normalizedFile === normalizedPath
+    })
+    
+    return isRelevant
+  } catch (error) {
+    console.warn(`Error checking commit relevance for ${commitHash}:`, error)
     return false
   }
 }
@@ -126,6 +137,9 @@ async function getRelevantCommits(git: SimpleGit, log: LogResult, relativePath: 
     }
   }
   
+  // Sort by date to ensure proper chronological order (newest first)
+  relevantCommits.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  
   return relevantCommits
 }
 
@@ -136,22 +150,52 @@ export async function extractGitDirectoryInfo(dirPath: string): Promise<GitFileI
   try {
     const repoPath = await findGitRoot(dirPath)
     if (!repoPath) {
+      console.warn(`No git repository found for directory: ${dirPath}`)
       return null
     }
     
     const git = getGitInstance(repoPath)
     const relativePath = path.relative(repoPath, dirPath)
     
-    // Get commits that affected this directory
+    // First, try to find POWER.md or main file in the directory
+    const powerMdPath = path.join(dirPath, 'POWER.md')
+    const powerMdRelativePath = path.relative(repoPath, powerMdPath)
+    
+    // Try to get git history for POWER.md specifically
+    try {
+      const powerMdLog: LogResult = await git.log({
+        file: powerMdRelativePath,
+        maxCount: 1000
+      })
+      
+      if (powerMdLog.all && powerMdLog.all.length > 0) {
+        const latestCommit = powerMdLog.all[0]
+        const oldestCommit = powerMdLog.all[powerMdLog.all.length - 1]
+        
+        return {
+          author: oldestCommit.author_name,
+          authorEmail: oldestCommit.author_email,
+          createdDate: oldestCommit.date,
+          lastModifiedDate: latestCommit.date,
+          commitHash: oldestCommit.hash,
+          commitMessage: oldestCommit.message
+        }
+      }
+    } catch (powerMdError) {
+      console.warn(`Could not get git history for POWER.md in ${relativePath}, trying directory approach:`, powerMdError)
+    }
+    
+    // Fallback: Get commits that affected this directory
     const log: LogResult = await git.log({
       from: 'HEAD',
-      maxCount: 100,
+      maxCount: 1000
     })
     
     // Filter commits that touched files in this directory
     const relevantCommits = await getRelevantCommits(git, log, relativePath)
     
     if (relevantCommits.length === 0) {
+      console.warn(`No relevant commits found for directory: ${relativePath}`)
       return null
     }
     
@@ -159,12 +203,12 @@ export async function extractGitDirectoryInfo(dirPath: string): Promise<GitFileI
     const oldestCommit = relevantCommits[relevantCommits.length - 1]
     
     return {
-      author: latestCommit.author_name,
-      authorEmail: latestCommit.author_email,
+      author: oldestCommit.author_name,
+      authorEmail: oldestCommit.author_email,
       createdDate: oldestCommit.date,
       lastModifiedDate: latestCommit.date,
-      commitHash: latestCommit.hash,
-      commitMessage: latestCommit.message
+      commitHash: oldestCommit.hash,
+      commitMessage: oldestCommit.message
     }
   } catch (error) {
     console.warn(`Failed to extract git directory info for ${dirPath}:`, error)
