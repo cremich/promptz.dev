@@ -46,4 +46,20 @@ describe('PageHeader', () => {
     
     expect(screen.getByTestId('pixel-particles')).toBeInTheDocument()
   })
+
+  it('does not render library legend by default', () => {
+    render(<PageHeader title="Title" description="Description" />)
+    
+    expect(screen.queryByText('Library Sources:')).not.toBeInTheDocument()
+  })
+
+  it('renders library legend when showLibraryLegend is true', () => {
+    render(<PageHeader title="Title" description="Description" showLibraryLegend />)
+    
+    expect(screen.getByText('Library Sources:')).toBeInTheDocument()
+    expect(screen.getByText('kiro-powers')).toBeInTheDocument()
+    expect(screen.getByText('Official Kiro library')).toBeInTheDocument()
+    expect(screen.getByText('promptz')).toBeInTheDocument()
+    expect(screen.getByText('Community library')).toBeInTheDocument()
+  })
 })

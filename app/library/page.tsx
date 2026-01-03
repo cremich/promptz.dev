@@ -120,6 +120,7 @@ export default function LibraryPage() {
       <PageHeader
         title={<>Browse the <Emphasis>Community Library</Emphasis></>}
         description="Find battle-tested prompts, powers, agents, and steering documents shared by the Kiro community. Copy, customize, and ship faster."
+        showLibraryLegend={true}
       >
         <Suspense fallback={<ContentTypeNavSkeleton />}>
           <ContentTypeNav />

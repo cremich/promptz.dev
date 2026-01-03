@@ -18,6 +18,7 @@ export default function PowersPage() {
       <PageHeader
         title={<><Emphasis>Powers</Emphasis> that extend Kiro&apos;s capabilities</>}
         description="Activate packaged integrations for AWS, Stripe, Terraform, and more. Each power brings domain expertise and best practices directly into your workflow."
+        showLibraryLegend={true}
       />
 
       <section className="container mx-auto max-w-7xl px-6 py-12">
