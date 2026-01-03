@@ -44,7 +44,7 @@ export function Hero() {
               className="h-11 bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] px-6 text-white hover:opacity-90"
             >
               <a
-                href="https://github.com/promptz-dev/promptz"
+                href="https://github.com/cremich/promptz.lib"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -53,7 +53,7 @@ export function Hero() {
               </a>
             </Button>
             <Button asChild variant="outline" size="lg" className="h-11 px-6">
-              <Link href="/prompts">Browse Library</Link>
+              <Link href="/library">Browse Library</Link>
             </Button>
           </div>
         </div>

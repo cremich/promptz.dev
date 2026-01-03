@@ -51,7 +51,6 @@ const config: Config = {
     "/coverage/",
     "\\.d\\.ts$",
     "/components/ui/*",
-    "/lib/content.ts"
   ]
 };
 

@@ -3,7 +3,7 @@ import { Navigation } from '@/components/navigation'
 import { Hero } from '@/components/hero'
 import { Footer } from '@/components/footer'
 import { CompactCard, CompactCardSkeleton } from '@/components/compact-card'
-import { getLatestContent } from '@/lib/content'
+import { getLatestContent } from '@/lib/library'
 
 // Loading skeleton for the content grid
 function ContentGridSkeleton() {

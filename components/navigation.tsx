@@ -8,6 +8,7 @@ import { useSearch } from '@/components/search-provider'
 import { cn } from '@/lib/utils'
 
 const navLinks = [
+  { href: '/library', label: 'Library' },
   { href: '/prompts', label: 'Prompts' },
   { href: '/agents', label: 'Agents' },
   { href: '/powers', label: 'Powers' },
