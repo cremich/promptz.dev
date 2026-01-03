@@ -1,6 +1,4 @@
 'use client'
-
-import React from 'react'
 import { useRouter } from 'next/navigation'
 import { SearchIcon } from 'lucide-react'
 import {
@@ -77,11 +75,11 @@ export function SearchModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={closeSearch}>
-      <DialogContent className="max-w-2xl max-h-[80vh] p-0 gap-0">
-        <div className="p-4 pb-0">
-          <InputGroup>
+      <DialogContent className="max-w-2xl max-h-[80vh]">
+        <div className="pt-4 pb-0">
+          <InputGroup className="h-12">
             <InputGroupAddon>
-              <SearchIcon className="h-4 w-4" />
+              <SearchIcon />
             </InputGroupAddon>
             <InputGroupInput
               ref={inputRef}
@@ -92,12 +90,6 @@ export function SearchModal() {
               className="text-base border-0 shadow-none focus-visible:ring-0"
               disabled={isLoading}
             />
-            <InputGroupAddon align="inline-end">
-              <KbdGroup>
-                <Kbd>⌘</Kbd>
-                <Kbd>K</Kbd>
-              </KbdGroup>
-            </InputGroupAddon>
           </InputGroup>
         </div>
 
