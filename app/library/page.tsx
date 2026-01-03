@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { PageHeader, Emphasis } from '@/components/page-header'
 import { Grid, GridSkeleton } from '@/components/grid'
 import { getAllContent } from '@/lib/library'
 import { getAllPrompts } from '@/lib/prompts'
@@ -83,7 +84,7 @@ async function ContentTypeNav() {
   const stats = await getContentStats()
 
   return (
-    <div className="mb-8 flex flex-wrap justify-center gap-2">
+    <div className="flex flex-wrap gap-2">
       {contentTypes.map((type) => (
         <Link
           key={type.href}
@@ -102,7 +103,7 @@ async function ContentTypeNav() {
 
 function ContentTypeNavSkeleton() {
   return (
-    <div className="mb-8 flex flex-wrap justify-center gap-2">
+    <div className="flex flex-wrap gap-2">
       {contentTypes.map((type) => (
         <div
           key={type.href}
@@ -115,29 +116,21 @@ function ContentTypeNavSkeleton() {
 
 export default function LibraryPage() {
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-      <main className="container mx-auto max-w-7xl px-6 py-16">
-        <div className="mb-16 flex flex-col items-center text-center">
-          <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-black dark:text-zinc-50">
-            Browse the Library
-          </h1>
-          <p className="mb-8 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Explore our complete collection of prompts, powers, agents, steering
-            documents, and hooks. Everything you need to supercharge your Kiro
-            development experience.
-          </p>
+    <>
+      <PageHeader
+        title={<>Browse the <Emphasis>Community Library</Emphasis></>}
+        description="Find battle-tested prompts, powers, agents, and steering documents shared by the Kiro community. Copy, customize, and ship faster."
+      >
+        <Suspense fallback={<ContentTypeNavSkeleton />}>
+          <ContentTypeNav />
+        </Suspense>
+      </PageHeader>
 
-          <Suspense fallback={<ContentTypeNavSkeleton />}>
-            <ContentTypeNav />
-          </Suspense>
-        </div>
-
-        <section>
-          <Suspense fallback={<LibraryLoading />}>
-            <LibraryContent />
-          </Suspense>
-        </section>
-      </main>
-    </div>
+      <section className="container mx-auto max-w-7xl px-6 py-12">
+        <Suspense fallback={<LibraryLoading />}>
+          <LibraryContent />
+        </Suspense>
+      </section>
+    </>
   )
 }

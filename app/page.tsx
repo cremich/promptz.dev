@@ -1,7 +1,5 @@
 import { Suspense } from 'react'
-import { Navigation } from '@/components/navigation'
 import { Hero } from '@/components/hero'
-import { Footer } from '@/components/footer'
 import { CompactCard, CompactCardSkeleton } from '@/components/compact-card'
 import { getLatestContent } from '@/lib/library'
 
@@ -39,34 +37,26 @@ async function LatestContentGrid() {
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-background font-sans">
-      <Navigation />
+    <>
+      <Hero />
 
-      <main className="flex-1">
-        <Hero />
-
-        {/* Latest Content Section */}
-        <section className="container mx-auto max-w-7xl px-6 py-16">
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight">
-                Latest Contributions
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Recently added resources from the community
-              </p>
-            </div>
+      {/* Latest Content Section */}
+      <section className="container mx-auto max-w-7xl px-6 py-16">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Latest Contributions
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Recently added resources from the community
+            </p>
           </div>
+        </div>
 
-          <Suspense fallback={<ContentGridSkeleton />}>
-            <LatestContentGrid />
-          </Suspense>
-        </section>
-      </main>
-
-      <Suspense fallback={null}>
-        <Footer />
-      </Suspense>
-    </div>
+        <Suspense fallback={<ContentGridSkeleton />}>
+          <LatestContentGrid />
+        </Suspense>
+      </section>
+    </>
   )
 }

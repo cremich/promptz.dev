@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -16,7 +18,6 @@ interface PowerDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-// Generate static params for all available powers
 export async function generateStaticParams() {
   try {
     const powers = await getAllPowers();
@@ -29,11 +30,9 @@ export async function generateStaticParams() {
   }
 }
 
-// Generate dynamic metadata for SEO
 export async function generateMetadata({ params }: PowerDetailPageProps): Promise<Metadata> {
   const { id: slug } = await params;
   
-  // Validate slug format
   if (!isValidSlug(slug)) {
     return {
       title: "Invalid Power URL | Promptz.dev",
@@ -84,13 +83,10 @@ export async function generateMetadata({ params }: PowerDetailPageProps): Promis
   };
 }
 
-// Load steering file content for a power
 async function loadSteeringFileContent(power: Power, filename: string): Promise<string> {
   try {
     const powerDir = power.path.replace('/POWER.md', '');
     const steeringFilePath = `${powerDir}/steering/${filename}`;
-    
-    // Use the same file reading utility as the content service
     const fs = await import('fs');
     const content = await fs.promises.readFile(steeringFilePath, 'utf-8');
     return content;
@@ -100,7 +96,6 @@ async function loadSteeringFileContent(power: Power, filename: string): Promise<
   }
 }
 
-// Load all steering files content for a power
 async function loadAllSteeringFiles(power: Power): Promise<Array<{ filename: string; content: string }>> {
   if (!power.steeringFiles || power.steeringFiles.length === 0) {
     return [];
@@ -116,7 +111,6 @@ async function loadAllSteeringFiles(power: Power): Promise<Array<{ filename: str
   return steeringContents;
 }
 
-// Power Content Tabs component
 function PowerContentTabs({ 
   power, 
   steeringContents 
@@ -125,7 +119,7 @@ function PowerContentTabs({
   steeringContents: Array<{ filename: string; content: string }> 
 }) {
   return (
-    <Card>
+    <Card className="border-border/40 bg-card/50">
       <CardHeader>
         <CardTitle className="text-xl">Power Content</CardTitle>
       </CardHeader>
@@ -143,8 +137,8 @@ function PowerContentTabs({
           
           <TabsContent value="prompt" className="mt-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">POWER.md</h3>
-              <pre className="whitespace-pre-wrap text-sm bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto border">
+              <h3 className="text-sm font-medium text-muted-foreground">POWER.md</h3>
+              <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
                 {power.content}
               </pre>
             </div>
@@ -152,13 +146,13 @@ function PowerContentTabs({
           
           <TabsContent value="configuration" className="mt-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">mcp.json</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">mcp.json</h3>
               {power.mcpConfig ? (
-                <pre className="whitespace-pre-wrap text-sm bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto border">
+                <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
                   {JSON.stringify(power.mcpConfig, null, 2)}
                 </pre>
               ) : (
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <p className="text-sm text-muted-foreground">
                   No MCP configuration available for this power.
                 </p>
               )}
@@ -167,7 +161,7 @@ function PowerContentTabs({
           
           <TabsContent value="steering" className="mt-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Steering Files</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">Steering Files</h3>
               {steeringContents.length > 0 ? (
                 <Accordion type="single" collapsible className="w-full">
                   {steeringContents.map((steeringFile, index) => (
@@ -176,7 +170,7 @@ function PowerContentTabs({
                         {steeringFile.filename}
                       </AccordionTrigger>
                       <AccordionContent>
-                        <pre className="whitespace-pre-wrap text-sm bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto border">
+                        <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
                           {steeringFile.content}
                         </pre>
                       </AccordionContent>
@@ -184,7 +178,7 @@ function PowerContentTabs({
                   ))}
                 </Accordion>
               ) : (
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <p className="text-sm text-muted-foreground">
                   No steering files available for this power.
                 </p>
               )}
@@ -195,8 +189,21 @@ function PowerContentTabs({
     </Card>
   );
 }
+
+function DetailSkeleton() {
+  return (
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      <div className="animate-pulse space-y-8">
+        <div className="h-5 w-24 rounded bg-muted" />
+        <div className="h-10 w-3/4 rounded bg-muted" />
+        <div className="h-24 rounded bg-muted" />
+        <div className="h-64 rounded bg-muted" />
+      </div>
+    </section>
+  );
+}
+
 async function PowerDetail({ slug }: { slug: string }) {
-  // Validate slug format
   if (!isValidSlug(slug)) {
     notFound();
   }
@@ -208,25 +215,31 @@ async function PowerDetail({ slug }: { slug: string }) {
     notFound();
   }
 
-  // Load steering files content
   const steeringContents = await loadAllSteeringFiles(power);
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-      <main className="container mx-auto max-w-4xl px-6 py-16">
-        {/* Header Section */}
-        <ContentHeader content={power} />
-        
-        {/* Keywords */}
-        <Keywords keywords={power.keywords} />
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      {/* Back Link */}
+      <Link
+        href="/powers"
+        className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Powers
+      </Link>
 
-        {/* Contributor Information */}
-        <ContributorInfo content={power} />
+      {/* Header */}
+      <ContentHeader content={power} />
+      
+      {/* Keywords */}
+      <Keywords keywords={power.keywords} />
 
-        {/* Power Content Tabs */}
-        <PowerContentTabs power={power} steeringContents={steeringContents} />
-      </main>
-    </div>
+      {/* Contributor Information */}
+      <ContributorInfo content={power} />
+
+      {/* Power Content Tabs */}
+      <PowerContentTabs power={power} steeringContents={steeringContents} />
+    </section>
   );
 }
 
@@ -234,17 +247,7 @@ export default async function PowerDetailPage({ params }: PowerDetailPageProps) 
   const { id: slug } = await params;
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-        <main className="container mx-auto max-w-4xl px-6 py-16">
-          <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
-            <div className="h-32 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-            <div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-          </div>
-        </main>
-      </div>
-    }>
+    <Suspense fallback={<DetailSkeleton />}>
       <PowerDetail slug={slug} />
     </Suspense>
   );

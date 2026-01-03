@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,7 +32,6 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: AgentDetailPageProps): Promise<Metadata> {
   const { id: slug } = await params;
   
-  // Validate slug format
   if (!isValidSlug(slug)) {
     return {
       title: "Invalid Agent URL | Promptz.dev",
@@ -64,9 +65,7 @@ export async function generateMetadata({ params }: AgentDetailPageProps): Promis
       author,
       "Kiro",
       "Amazon Q Developer",
-      // Safely spread mcpServers if it's an array
       ...(Array.isArray(agent.config.mcpServers) ? agent.config.mcpServers : []),
-      // Safely spread tools if it's an array
       ...(Array.isArray(agent.config.tools) ? agent.config.tools : [])
     ],
     authors: [{ name: author }],
@@ -86,7 +85,6 @@ export async function generateMetadata({ params }: AgentDetailPageProps): Promis
   };
 }
 
-// Extract library name from content path
 function getLibraryName(path: string): string {
   const pathParts = path.split('/');
   const librariesIndex = pathParts.indexOf('libraries');
@@ -97,9 +95,20 @@ function getLibraryName(path: string): string {
   return 'unknown';
 }
 
-// Server component to display agent details
+function DetailSkeleton() {
+  return (
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      <div className="animate-pulse space-y-8">
+        <div className="h-5 w-24 rounded bg-muted" />
+        <div className="h-10 w-3/4 rounded bg-muted" />
+        <div className="h-24 rounded bg-muted" />
+        <div className="h-64 rounded bg-muted" />
+      </div>
+    </section>
+  );
+}
+
 async function AgentDetail({ slug }: { slug: string }) {
-  // Validate slug format
   if (!isValidSlug(slug)) {
     notFound();
   }
@@ -112,81 +121,89 @@ async function AgentDetail({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-      <main className="container mx-auto max-w-4xl px-6 py-16">
-        <ContentHeader content={agent} />
-        <ContributorInfo content={agent} />
-        
-        {/* Agent Configuration and Content */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Agent Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="configuration" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="configuration">Configuration</TabsTrigger>
-                <TabsTrigger value="prompt">Prompt</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="configuration" className="mt-6">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-2">
-                      Agent Configuration
-                    </h3>
-                    <pre className="text-sm bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto border">
-                      {JSON.stringify(agent.config, null, 2)}
-                    </pre>
-                  </div>
-                  
-                  {Array.isArray(agent.config.mcpServers) && agent.config.mcpServers.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-2">
-                        MCP Servers
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {agent.config.mcpServers.map((server, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {server}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {Array.isArray(agent.config.tools) && agent.config.tools.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-2">
-                        Tools
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {agent.config.tools.map((tool, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {tool}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="prompt" className="mt-6">
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      {/* Back Link */}
+      <Link
+        href="/agents"
+        className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Agents
+      </Link>
+
+      {/* Header */}
+      <ContentHeader content={agent} />
+      <ContributorInfo content={agent} />
+      
+      {/* Agent Configuration and Content */}
+      <Card className="border-border/40 bg-card/50">
+        <CardHeader>
+          <CardTitle className="text-xl">Agent Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="configuration" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="configuration">Configuration</TabsTrigger>
+              <TabsTrigger value="prompt">Prompt</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="configuration" className="mt-6">
+              <div className="space-y-6">
                 <div>
-                  <h3 className="font-semibold text-sm text-zinc-600 dark:text-zinc-400 mb-2">
-                    Agent Prompt
+                  <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+                    Agent Configuration
                   </h3>
-                  <pre className="whitespace-pre-wrap text-sm bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto border">
-                    {agent.content}
+                  <pre className="overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
+                    {JSON.stringify(agent.config, null, 2)}
                   </pre>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+                
+                {Array.isArray(agent.config.mcpServers) && agent.config.mcpServers.length > 0 && (
+                  <div>
+                    <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+                      MCP Servers
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {agent.config.mcpServers.map((server, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {server}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {Array.isArray(agent.config.tools) && agent.config.tools.length > 0 && (
+                  <div>
+                    <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+                      Tools
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {agent.config.tools.map((tool, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {tool}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="prompt" className="mt-6">
+              <div>
+                <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+                  Agent Prompt
+                </h3>
+                <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
+                  {agent.content}
+                </pre>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </section>
   );
 }
 
@@ -194,17 +211,7 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
   const { id: slug } = await params;
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-        <main className="container mx-auto max-w-4xl px-6 py-16">
-          <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
-            <div className="h-32 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-            <div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-          </div>
-        </main>
-      </div>
-    }>
+    <Suspense fallback={<DetailSkeleton />}>
       <AgentDetail slug={slug} />
     </Suspense>
   );

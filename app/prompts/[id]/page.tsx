@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ContentHeader } from "@/components/content-header";
@@ -13,7 +15,6 @@ interface PromptDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-// Generate static params for all available prompts
 export async function generateStaticParams() {
   try {
     const prompts = await getAllPrompts();
@@ -26,11 +27,9 @@ export async function generateStaticParams() {
   }
 }
 
-// Generate dynamic metadata for SEO
 export async function generateMetadata({ params }: PromptDetailPageProps): Promise<Metadata> {
   const { id: slug } = await params;
   
-  // Validate slug format
   if (!isValidSlug(slug)) {
     return {
       title: "Invalid Prompt URL | Promptz.dev",
@@ -80,9 +79,20 @@ export async function generateMetadata({ params }: PromptDetailPageProps): Promi
   };
 }
 
-// Server component to display prompt details
+function DetailSkeleton() {
+  return (
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      <div className="animate-pulse space-y-8">
+        <div className="h-5 w-24 rounded bg-muted" />
+        <div className="h-10 w-3/4 rounded bg-muted" />
+        <div className="h-24 rounded bg-muted" />
+        <div className="h-64 rounded bg-muted" />
+      </div>
+    </section>
+  );
+}
+
 async function PromptDetail({ slug }: { slug: string }) {
-  // Validate slug format
   if (!isValidSlug(slug)) {
     notFound();
   }
@@ -95,36 +105,43 @@ async function PromptDetail({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-      <main className="container mx-auto max-w-4xl px-6 py-16">
-        {/* Header Section */}
-        <ContentHeader content={prompt} />
-        
-        {/* Category Badge */}
-        {prompt.category && (
-          <div className="mb-8">
-            <Badge variant="outline" className="text-xs">
-              {prompt.category}
-            </Badge>
-          </div>
-        )}
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      {/* Back Link */}
+      <Link
+        href="/prompts"
+        className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Prompts
+      </Link>
 
-        {/* Contributor Information */}
-        <ContributorInfo content={prompt} />
+      {/* Header */}
+      <ContentHeader content={prompt} />
+      
+      {/* Category Badge */}
+      {prompt.category && (
+        <div className="mb-8">
+          <Badge variant="outline" className="text-xs">
+            {prompt.category}
+          </Badge>
+        </div>
+      )}
 
-        {/* Prompt Content */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Prompt Content</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <pre className="whitespace-pre-wrap text-sm bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto border">
-              {prompt.content}
-            </pre>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+      {/* Contributor Information */}
+      <ContributorInfo content={prompt} />
+
+      {/* Prompt Content */}
+      <Card className="border-border/40 bg-card/50">
+        <CardHeader>
+          <CardTitle className="text-xl">Prompt Content</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
+            {prompt.content}
+          </pre>
+        </CardContent>
+      </Card>
+    </section>
   );
 }
 
@@ -132,17 +149,7 @@ export default async function PromptDetailPage({ params }: PromptDetailPageProps
   const { id: slug } = await params;
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-        <main className="container mx-auto max-w-4xl px-6 py-16">
-          <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
-            <div className="h-32 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-            <div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-          </div>
-        </main>
-      </div>
-    }>
+    <Suspense fallback={<DetailSkeleton />}>
       <PromptDetail slug={slug} />
     </Suspense>
   );

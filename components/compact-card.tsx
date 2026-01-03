@@ -7,8 +7,6 @@ import { LibraryBadge } from '@/components/library-badge'
 import { BadgeContainer } from '@/components/badge-container'
 import { GitHash } from '@/components/git-hash'
 import { ContentDate } from '@/components/content-date'
-import { Keywords } from '@/components/keywords'
-import { HookTriggerBadge } from '@/components/hook-trigger-badge'
 import { cn } from '@/lib/utils'
 import type { ContentItem } from '@/lib/types/content'
 

@@ -42,6 +42,18 @@ fileMatchPattern: "**/*.{tsx,jsx,css}"
 - Provide alternative indicators beyond color for important information
 - Context: Color accessibility ensures usability for users with visual impairments
 
+## Brand Color System
+
+- Use the established brand color palette consistently across all components:
+  - Primary: Indigo (#4F46E5 light / #818CF8 dark)
+  - Secondary: Violet (#7C3AED light / #A78BFA dark)
+  - Complementary: Cyan (#06B6D4)
+- Apply gradient backgrounds using brand colors for visual hierarchy
+- Use `.text-gradient` utility class for gradient text effects on headings
+- Use `.card-gradient` and `.card-gradient-hover` for card backgrounds
+- Define brand colors as CSS custom properties for theme consistency
+- Context: Consistent brand colors create visual identity and improve recognition
+
 ## Layout and Spacing
 
 - Use CSS Grid for two-dimensional layouts
@@ -81,10 +93,14 @@ fileMatchPattern: "**/*.{tsx,jsx,css}"
 - Implement hover and focus states for interactive elements
 - Use Tailwind's transition utilities for smooth animations
 - Context: Well-designed micro-interactions improve perceived performance and usability
-- Respect user preferences for reduced motion
+- Respect user preferences for reduced motion using `prefers-reduced-motion` media query
 - Provide alternatives to motion-based interactions
 - Ensure animations don't interfere with screen readers
 - Context: Motion accessibility ensures usability for users with vestibular disorders
+- Use canvas-based animations (like PixelParticles) for complex visual effects
+- Implement animation cleanup in useEffect return functions to prevent memory leaks
+- Keep particle counts reasonable based on viewport size for performance
+- Context: Canvas animations provide smooth visuals without impacting DOM performance
 
 ## Component Styling Patterns
 
@@ -96,3 +112,19 @@ fileMatchPattern: "**/*.{tsx,jsx,css}"
 - Use TypeScript to enforce valid variant combinations
 - Provide sensible defaults for component variants
 - Context: Style variants provide flexibility while maintaining consistency
+- Use type-specific gradient backgrounds for content cards (CompactCard pattern)
+- Apply transform scale effects on hover for interactive card elements
+- Use backdrop-blur for overlay and navigation components
+- Context: Consistent interaction patterns improve user experience and learnability
+
+## Layout Components
+
+- Use sticky positioning for navigation headers with backdrop blur
+- Implement responsive navigation with hidden elements on mobile
+- Structure footer with grid layout for link sections
+- Use container with max-width constraints for content centering
+- Context: Consistent layout patterns ensure visual coherence across pages
+- Create hero sections with relative positioning for layered effects
+- Use gradient overlays for visual depth in hero backgrounds
+- Implement CTAs with gradient backgrounds for visual prominence
+- Context: Hero sections establish visual hierarchy and guide user attention

@@ -11,6 +11,8 @@ promptz.dev/
 │   ├── hooks/              # Agent hooks listing and detail pages
 │   │   ├── [slug]/         # Dynamic hook detail pages
 │   │   └── page.tsx        # Hooks listing page
+│   ├── library/            # Unified library browsing page
+│   │   └── page.tsx        # All content types listing with filters
 │   ├── powers/             # Kiro powers listing and detail pages
 │   │   ├── [slug]/         # Dynamic power detail pages
 │   │   └── page.tsx        # Powers listing page
@@ -26,7 +28,13 @@ promptz.dev/
 │   └── favicon.ico         # Site favicon
 ├── components/             # React components
 │   ├── ui/                 # Shadcn UI components
+│   ├── search/             # Search modal components
 │   ├── *-card.tsx          # Content type-specific card components
+│   ├── compact-card.tsx    # Unified compact card with type gradients
+│   ├── navigation.tsx      # Sticky header with nav links and search
+│   ├── hero.tsx            # Landing page hero section
+│   ├── footer.tsx          # Site footer with links and branding
+│   ├── pixel-particles.tsx # Canvas-based animated particle effect
 │   ├── badge-container.tsx # Badge grouping utility component
 │   ├── content-date.tsx    # Date formatting and display component
 │   ├── content-header.tsx  # Standardized content headers
@@ -84,7 +92,7 @@ promptz.dev/
 - **lib/formatter/date.ts**: Date formatting and comparison utilities
 - **lib/formatter/git.ts**: Git information formatting utilities
 - **lib/formatter/slug.ts**: URL slug generation utilities
-- **lib/library.ts**: Library name extraction utilities
+- **lib/library.ts**: Library name extraction and unified content aggregation utilities
 - **lib/search.ts**: Search utilities, validation, and error handling
 - **lib/{type}.ts**: Type-specific data loading services (prompts.ts, agents.ts, etc.)
 
@@ -143,9 +151,10 @@ interface SearchIndex {
 ## App Directory Structure (Next.js 16 App Router)
 
 ### Core Pages
-- **app/layout.tsx**: Root layout with Geist fonts, global styles, and metadata
-- **app/page.tsx**: Homepage with server components and Suspense boundaries
-- **app/globals.css**: Global CSS with Tailwind imports and custom properties
+- **app/layout.tsx**: Root layout with Geist fonts, JetBrains Mono, global styles, and metadata
+- **app/page.tsx**: Homepage with Navigation, Hero, latest content grid, and Footer
+- **app/library/page.tsx**: Unified library browsing page with content type filters and stats
+- **app/globals.css**: Global CSS with Tailwind imports, brand colors, and custom utilities
 - **app/favicon.ico**: Site favicon and branding assets
 
 ### Content Type Pages
@@ -182,6 +191,7 @@ interface SearchIndex {
 - **components/power-card.tsx**: Power card with keywords and MCP info
 - **components/steering-card.tsx**: Steering document card with category
 - **components/hook-card.tsx**: Hook card with trigger information
+- **components/compact-card.tsx**: Unified compact card with type-specific gradient backgrounds
 - **Reusable Content Components**:
   - **components/content-header.tsx**: Standardized content headers with title and metadata
   - **components/content-date.tsx**: Date formatting and display component
@@ -193,6 +203,11 @@ interface SearchIndex {
   - **components/content-type-badge.tsx**: Content type indicator badges
   - **components/library-badge.tsx**: Library source indicator badges
   - **components/hook-trigger-badge.tsx**: Hook trigger type display
+- **Layout Components**:
+  - **components/navigation.tsx**: Sticky header with logo, nav links, and search button
+  - **components/hero.tsx**: Landing page hero with gradient background, badge, and CTAs
+  - **components/footer.tsx**: Site footer with resource links, community links, and branding
+  - **components/pixel-particles.tsx**: Canvas-based animated pixel particle effect
 - **Search Components** (`components/search/`):
   - **components/search-provider.tsx**: React context for global search state
   - **components/search-button.tsx**: Search trigger with keyboard shortcut display
@@ -208,6 +223,8 @@ interface SearchIndex {
 - **Accessibility**: ARIA labels, semantic HTML, keyboard navigation
 - **Dark mode support**: CSS variables and Tailwind dark mode utilities
 - **Global search**: Keyboard-accessible search modal with fuzzy matching
+- **Brand identity**: Gradient text effects and type-specific card gradients
+- **Animated effects**: Canvas-based pixel particles with reduced motion support
 
 ## Libraries Directory (Git Submodules)
 

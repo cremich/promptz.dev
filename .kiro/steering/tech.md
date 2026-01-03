@@ -12,9 +12,13 @@
 - **Tailwind CSS 4**: Utility-first CSS framework with PostCSS integration
 - **Shadcn UI**: Component library for consistent, accessible UI components
 - **Geist Font Family**: Modern font stack optimized for developer interfaces (Geist Sans & Geist Mono)
+- **JetBrains Mono**: Monospace font for code display and technical content
 - **Dark Mode**: Primary theme with light mode alternative using CSS variables
 - **Responsive Design**: Mobile-first approach with Tailwind breakpoint system
 - **Lucide React**: Icon library for consistent iconography
+- **Brand Color System**: Primary indigo (#4F46E5), secondary violet (#7C3AED), complementary cyan (#06B6D4)
+- **Gradient Effects**: Text gradients and card background gradients for visual hierarchy
+- **Animated Particles**: Canvas-based pixel particle effects for hero sections
 
 ## Development Tools
 
@@ -88,6 +92,7 @@
 - **Steering Service** (`lib/steering.ts`): Steering documents data loading from static JSON
 - **Hooks Service** (`lib/hooks.ts`): Hooks data loading from static JSON
 - **Search Service** (`lib/search.ts`): Search utilities, validation, and error handling
+- **Library Service** (`lib/library.ts`): Unified content aggregation with `getAllContent()` and `getLatestContent()` functions
 
 ### Key Features
 - **Build-time Processing**: All content processed during build for optimal performance
@@ -119,6 +124,7 @@
 ### Content Components
 - **Grid Component** (`components/grid.tsx`): Responsive grid with type-safe rendering
 - **Content Cards**: Type-specific cards (prompt-card, agent-card, power-card, steering-card, hook-card)
+- **Compact Card** (`components/compact-card.tsx`): Unified card component with type-specific gradient backgrounds
 - **Reusable Components**: Modular content display components
   - **Content Header** (`components/content-header.tsx`): Standardized content headers
   - **Content Date** (`components/content-date.tsx`): Date formatting and display
@@ -131,6 +137,11 @@
   - **Library Badge** (`components/library-badge.tsx`): Library source indicators
   - **Hook Trigger Badge** (`components/hook-trigger-badge.tsx`): Hook trigger type display
 - **Skeleton States**: Loading placeholders for all content types
+- **Layout Components**: Site-wide layout elements
+  - **Navigation** (`components/navigation.tsx`): Sticky header with logo, nav links, and search button
+  - **Hero** (`components/hero.tsx`): Landing page hero section with gradient background and CTAs
+  - **Footer** (`components/footer.tsx`): Site footer with resource links and branding
+  - **Pixel Particles** (`components/pixel-particles.tsx`): Canvas-based animated particle effect
 - **Search Components**: Global search functionality
   - **Search Provider** (`components/search-provider.tsx`): React context for search state management
   - **Search Button** (`components/search-button.tsx`): Trigger button with keyboard shortcut display

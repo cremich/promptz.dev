@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ContentHeader } from "@/components/content-header";
 import { ContributorInfo } from "@/components/contributor-info";
@@ -14,7 +16,6 @@ interface HookDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-// Generate static params for all available hooks
 export async function generateStaticParams() {
   try {
     const hooks = await getAllHooks();
@@ -27,11 +28,9 @@ export async function generateStaticParams() {
   }
 }
 
-// Generate dynamic metadata for SEO
 export async function generateMetadata({ params }: HookDetailPageProps): Promise<Metadata> {
   const { id: slug } = await params;
   
-  // Validate slug format
   if (!isValidSlug(slug)) {
     return {
       title: "Invalid Agent Hook URL | Promptz.dev",
@@ -52,7 +51,6 @@ export async function generateMetadata({ params }: HookDetailPageProps): Promise
   return generateHookMetadata(hook);
 }
 
-// Extract metadata generation logic
 function generateHookMetadata(hook: Hook): Metadata {
   const libraryName = getLibraryName(hook.path);
   const author = hook.git?.author || hook.author;
@@ -88,25 +86,20 @@ function generateHookMetadata(hook: Hook): Metadata {
   };
 }
 
-// Render hook content section
-function HookContentSection({ content }: { content: string }) {
+function DetailSkeleton() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl">Hook Configuration</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <pre className="whitespace-pre-wrap text-sm bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto border">
-          {content}
-        </pre>
-      </CardContent>
-    </Card>
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      <div className="animate-pulse space-y-8">
+        <div className="h-5 w-24 rounded bg-muted" />
+        <div className="h-10 w-3/4 rounded bg-muted" />
+        <div className="h-24 rounded bg-muted" />
+        <div className="h-64 rounded bg-muted" />
+      </div>
+    </section>
   );
 }
 
-// Server component to display hook details
 async function HookDetail({ slug }: { slug: string }) {
-  // Validate slug format
   if (!isValidSlug(slug)) {
     notFound();
   }
@@ -119,23 +112,39 @@ async function HookDetail({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-      <main className="container mx-auto max-w-4xl px-6 py-16">
-        {/* Header Section with additional trigger badge */}
-        <div className="mb-8">
-          <ContentHeader content={hook} />
-          <div className="flex flex-wrap gap-2 mt-4">
-            <HookTriggerBadge trigger={hook.trigger} />
-          </div>
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      {/* Back Link */}
+      <Link
+        href="/hooks"
+        className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Hooks
+      </Link>
+
+      {/* Header with Trigger Badge */}
+      <div className="mb-8">
+        <ContentHeader content={hook} />
+        <div className="mt-4 flex flex-wrap gap-2">
+          <HookTriggerBadge trigger={hook.trigger} />
         </div>
+      </div>
 
-        {/* Contributor Information */}
-        <ContributorInfo content={hook} />
+      {/* Contributor Information */}
+      <ContributorInfo content={hook} />
 
-        {/* Hook Content */}
-        <HookContentSection content={hook.content} />
-      </main>
-    </div>
+      {/* Hook Content */}
+      <Card className="border-border/40 bg-card/50">
+        <CardHeader>
+          <CardTitle className="text-xl">Hook Configuration</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
+            {hook.content}
+          </pre>
+        </CardContent>
+      </Card>
+    </section>
   );
 }
 
@@ -143,17 +152,7 @@ export default async function HookDetailPage({ params }: HookDetailPageProps) {
   const { id: slug } = await params;
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-        <main className="container mx-auto max-w-4xl px-6 py-16">
-          <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
-            <div className="h-32 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-            <div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-          </div>
-        </main>
-      </div>
-    }>
+    <Suspense fallback={<DetailSkeleton />}>
       <HookDetail slug={slug} />
     </Suspense>
   );

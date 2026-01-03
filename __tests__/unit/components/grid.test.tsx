@@ -2,68 +2,16 @@ import { render, screen } from '@testing-library/react'
 import { Grid, GridSkeleton } from '@/components/grid'
 import type { ContentItem } from '@/lib/types/content'
 
-// Mock all the individual card components
-jest.mock('@/components/agent-card', () => ({
-  AgentCard: ({ agent, className }: { agent: { title: string }; className?: string }) => (
-    <div data-testid="agent-card" className={className}>
-      {agent.title}
+// Mock the CompactCard component
+jest.mock('@/components/compact-card', () => ({
+  CompactCard: ({ item, className }: { item: { id: string; title: string }; className?: string }) => (
+    <div data-testid="compact-card" data-item-id={item.id} className={className}>
+      {item.title}
     </div>
   ),
-  AgentCardSkeleton: ({ className }: { className?: string }) => (
-    <div data-testid="agent-card-skeleton" className={className}>
-      Loading agent...
-    </div>
-  )
-}))
-
-jest.mock('@/components/hook-card', () => ({
-  HookCard: ({ hook, className }: { hook: { title: string }; className?: string }) => (
-    <div data-testid="hook-card" className={className}>
-      {hook.title}
-    </div>
-  ),
-  HookCardSkeleton: ({ className }: { className?: string }) => (
-    <div data-testid="hook-card-skeleton" className={className}>
-      Loading hook...
-    </div>
-  )
-}))
-
-jest.mock('@/components/power-card', () => ({
-  PowerCard: ({ power, className }: { power: { title: string }; className?: string }) => (
-    <div data-testid="power-card" className={className}>
-      {power.title}
-    </div>
-  ),
-  PowerCardSkeleton: ({ className }: { className?: string }) => (
-    <div data-testid="power-card-skeleton" className={className}>
-      Loading power...
-    </div>
-  )
-}))
-
-jest.mock('@/components/prompt-card', () => ({
-  PromptCard: ({ prompt, className }: { prompt: { title: string }; className?: string }) => (
-    <div data-testid="prompt-card" className={className}>
-      {prompt.title}
-    </div>
-  ),
-  PromptCardSkeleton: ({ className }: { className?: string }) => (
-    <div data-testid="prompt-card-skeleton" className={className}>
-      Loading prompt...
-    </div>
-  )
-}))
-
-jest.mock('@/components/steering-card', () => ({
-  SteeringCard: ({ steering, className }: { steering: { title: string }; className?: string }) => (
-    <div data-testid="steering-card" className={className}>
-      {steering.title}
-    </div>
-  ),
-  SteeringCardSkeleton: ({ className }: { className?: string }) => (
-    <div data-testid="steering-card-skeleton" className={className}>
-      Loading steering...
+  CompactCardSkeleton: ({ className }: { className?: string }) => (
+    <div data-testid="compact-card-skeleton" className={className}>
+      Loading...
     </div>
   )
 }))
@@ -133,11 +81,8 @@ describe('Grid', () => {
     expect(screen.getByText('Test Hook 1')).toBeInTheDocument()
     expect(screen.getByText('Test Steering 1')).toBeInTheDocument()
     
-    expect(screen.getByTestId('prompt-card')).toBeInTheDocument()
-    expect(screen.getByTestId('agent-card')).toBeInTheDocument()
-    expect(screen.getByTestId('power-card')).toBeInTheDocument()
-    expect(screen.getByTestId('hook-card')).toBeInTheDocument()
-    expect(screen.getByTestId('steering-card')).toBeInTheDocument()
+    const allCards = screen.getAllByTestId('compact-card')
+    expect(allCards).toHaveLength(5)
   })
 
   it('should limit items when maxItems is specified', () => {
@@ -149,7 +94,7 @@ describe('Grid', () => {
     expect(screen.queryByText('Test Hook 1')).not.toBeInTheDocument()
     expect(screen.queryByText('Test Steering 1')).not.toBeInTheDocument()
     
-    const allCards = screen.getAllByTestId(/-(card)$/)
+    const allCards = screen.getAllByTestId('compact-card')
     expect(allCards).toHaveLength(3)
   })
 
@@ -158,7 +103,7 @@ describe('Grid', () => {
     
     expect(screen.getByText('No content available')).toBeInTheDocument()
     expect(screen.getByText('Check back later for new content')).toBeInTheDocument()
-    expect(screen.queryByTestId(/-(card)$/)).not.toBeInTheDocument()
+    expect(screen.queryByTestId('compact-card')).not.toBeInTheDocument()
   })
 
   it('should apply custom className', () => {
@@ -179,7 +124,7 @@ describe('Grid', () => {
   it('should apply h-full class to all cards', () => {
     render(<Grid items={mockContentItems} />)
     
-    const allCards = screen.getAllByTestId(/-(card)$/)
+    const allCards = screen.getAllByTestId('compact-card')
     allCards.forEach(card => {
       expect(card).toHaveClass('h-full')
     })
@@ -189,41 +134,34 @@ describe('Grid', () => {
     render(<Grid items={mockContentItems} maxItems={0} />)
     
     expect(screen.getByText('No content available')).toBeInTheDocument()
-    expect(screen.queryByTestId(/-(card)$/)).not.toBeInTheDocument()
+    expect(screen.queryByTestId('compact-card')).not.toBeInTheDocument()
   })
 
   it('should handle maxItems larger than items array', () => {
     render(<Grid items={mockContentItems} maxItems={10} />)
     
-    const allCards = screen.getAllByTestId(/-(card)$/)
-    expect(allCards).toHaveLength(5) // Should still only render 5 items
+    const allCards = screen.getAllByTestId('compact-card')
+    expect(allCards).toHaveLength(5)
   })
 
-  it('should render different content types correctly', () => {
-    const singleTypeItems = [mockContentItems[0]] // Just the prompt
-    render(<Grid items={singleTypeItems} />)
+  it('should render single item correctly', () => {
+    const singleItem = [mockContentItems[0]]
+    render(<Grid items={singleItem} />)
     
-    expect(screen.getByTestId('prompt-card')).toBeInTheDocument()
-    expect(screen.queryByTestId('agent-card')).not.toBeInTheDocument()
+    const allCards = screen.getAllByTestId('compact-card')
+    expect(allCards).toHaveLength(1)
+    expect(screen.getByText('Test Prompt 1')).toBeInTheDocument()
   })
 
-  it('should handle unknown content type gracefully', () => {
-    // Create an item with an invalid type to test the default case
-    const invalidItem = {
-      ...mockContentItems[0],
-      type: 'unknown'
-    } as unknown
+  it('should pass correct item id to each card', () => {
+    render(<Grid items={mockContentItems} />)
     
-    //@ts-expect-error Testing invalid item type for error handling
-    const { container } = render(<Grid items={[invalidItem]} />)
-    
-    // Should not render any card for unknown type (returns null)
-    expect(screen.queryByTestId(/-(card)$/)).not.toBeInTheDocument()
-    
-    // Should still render the grid container
-    const gridContainer = container.firstChild
-    expect(gridContainer).toHaveClass('grid')
-    expect(gridContainer).toHaveClass('gap-6')
+    const allCards = screen.getAllByTestId('compact-card')
+    expect(allCards[0]).toHaveAttribute('data-item-id', 'promptz/prompts/prompt-1')
+    expect(allCards[1]).toHaveAttribute('data-item-id', 'promptz/agents/agent-1')
+    expect(allCards[2]).toHaveAttribute('data-item-id', 'kiro-powers/power-1')
+    expect(allCards[3]).toHaveAttribute('data-item-id', 'promptz/hooks/hook-1')
+    expect(allCards[4]).toHaveAttribute('data-item-id', 'promptz/steering/steering-1')
   })
 })
 
@@ -231,14 +169,14 @@ describe('GridSkeleton', () => {
   it('should render default number of skeleton cards', () => {
     render(<GridSkeleton />)
     
-    const skeletonCards = screen.getAllByTestId(/-(card-skeleton)$/)
-    expect(skeletonCards).toHaveLength(6) // Default count
+    const skeletonCards = screen.getAllByTestId('compact-card-skeleton')
+    expect(skeletonCards).toHaveLength(6)
   })
 
   it('should render custom number of skeleton cards', () => {
     render(<GridSkeleton count={3} />)
     
-    const skeletonCards = screen.getAllByTestId(/-(card-skeleton)$/)
+    const skeletonCards = screen.getAllByTestId('compact-card-skeleton')
     expect(skeletonCards).toHaveLength(3)
   })
 
@@ -260,7 +198,7 @@ describe('GridSkeleton', () => {
   it('should apply h-full class to skeleton cards', () => {
     render(<GridSkeleton />)
     
-    const skeletonCards = screen.getAllByTestId(/-(card-skeleton)$/)
+    const skeletonCards = screen.getAllByTestId('compact-card-skeleton')
     skeletonCards.forEach(card => {
       expect(card).toHaveClass('h-full')
     })
@@ -269,20 +207,7 @@ describe('GridSkeleton', () => {
   it('should handle count of 0', () => {
     render(<GridSkeleton count={0} />)
     
-    const skeletonCards = screen.queryAllByTestId(/-(card-skeleton)$/)
+    const skeletonCards = screen.queryAllByTestId('compact-card-skeleton')
     expect(skeletonCards).toHaveLength(0)
-  })
-
-  it('should render variety of skeleton types', () => {
-    render(<GridSkeleton count={5} />)
-    
-    // Should have different skeleton types due to rotating pattern
-    const skeletonCards = screen.getAllByTestId(/-(card-skeleton)$/)
-    expect(skeletonCards).toHaveLength(5)
-    
-    // Check that we have different types (the rotating pattern should give us variety)
-    const skeletonTypes = skeletonCards.map(card => card.getAttribute('data-testid'))
-    const uniqueTypes = new Set(skeletonTypes)
-    expect(uniqueTypes.size).toBeGreaterThan(1) // Should have multiple types
   })
 })

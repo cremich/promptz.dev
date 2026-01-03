@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getSteeringById, getAllSteering } from "@/lib/steering";
@@ -13,7 +15,6 @@ interface SteeringDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-// Generate static params for all available steering documents
 export async function generateStaticParams() {
   try {
     const steering = await getAllSteering();
@@ -26,11 +27,9 @@ export async function generateStaticParams() {
   }
 }
 
-// Generate dynamic metadata for SEO
 export async function generateMetadata({ params }: SteeringDetailPageProps): Promise<Metadata> {
   const { id: slug } = await params;
   
-  // Validate slug format
   if (!isValidSlug(slug)) {
     return {
       title: "Invalid Steering Document URL | Promptz.dev",
@@ -82,9 +81,20 @@ export async function generateMetadata({ params }: SteeringDetailPageProps): Pro
   };
 }
 
-// Server component to display steering document details
+function DetailSkeleton() {
+  return (
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      <div className="animate-pulse space-y-8">
+        <div className="h-5 w-24 rounded bg-muted" />
+        <div className="h-10 w-3/4 rounded bg-muted" />
+        <div className="h-24 rounded bg-muted" />
+        <div className="h-64 rounded bg-muted" />
+      </div>
+    </section>
+  );
+}
+
 async function SteeringDetail({ slug }: { slug: string }) {
-  // Validate slug format
   if (!isValidSlug(slug)) {
     notFound();
   }
@@ -97,36 +107,43 @@ async function SteeringDetail({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-      <main className="container mx-auto max-w-4xl px-6 py-16">
-        {/* Header Section */}
-        <ContentHeader content={steering} />
+    <section className="container mx-auto max-w-4xl px-6 py-12">
+      {/* Back Link */}
+      <Link
+        href="/steering"
+        className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Steering
+      </Link>
 
-        {/* Add category badge if present */}
-        {steering.category && (
-          <div className="mb-8">
-            <Badge variant="outline" className="text-xs">
-              {steering.category}
-            </Badge>
-          </div>
-        )}
+      {/* Header */}
+      <ContentHeader content={steering} />
 
-        {/* Contributor Information */}
-        <ContributorInfo content={steering} />
+      {/* Category Badge */}
+      {steering.category && (
+        <div className="mb-8">
+          <Badge variant="outline" className="text-xs">
+            {steering.category}
+          </Badge>
+        </div>
+      )}
 
-        {/* Steering Document Content */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Steering Document Content</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <pre className="whitespace-pre-wrap text-sm bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg overflow-x-auto border">
-              {steering.content}
-            </pre>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+      {/* Contributor Information */}
+      <ContributorInfo content={steering} />
+
+      {/* Steering Document Content */}
+      <Card className="border-border/40 bg-card/50">
+        <CardHeader>
+          <CardTitle className="text-xl">Steering Document Content</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <pre className="whitespace-pre-wrap overflow-x-auto rounded-lg border border-border/40 bg-muted/50 p-4 text-sm">
+            {steering.content}
+          </pre>
+        </CardContent>
+      </Card>
+    </section>
   );
 }
 
@@ -134,17 +151,7 @@ export default async function SteeringDetailPage({ params }: SteeringDetailPageP
   const { id: slug } = await params;
 
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-        <main className="container mx-auto max-w-4xl px-6 py-16">
-          <div className="animate-pulse space-y-8">
-            <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4"></div>
-            <div className="h-32 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-            <div className="h-64 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-          </div>
-        </main>
-      </div>
-    }>
+    <Suspense fallback={<DetailSkeleton />}>
       <SteeringDetail slug={slug} />
     </Suspense>
   );

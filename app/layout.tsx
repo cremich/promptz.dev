@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SearchProvider } from '@/components/search-provider'
 import { SearchModal } from '@/components/search/search-modal'
+import { Navigation } from '@/components/navigation'
+import { Footer } from '@/components/footer'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,7 +55,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <SearchProvider>
-          {children}
+          <div className="flex min-h-screen flex-col bg-background font-sans">
+            <Navigation />
+            <main className="flex-1">{children}</main>
+            <Suspense fallback={null}>
+              <Footer />
+            </Suspense>
+          </div>
           <SearchModal />
         </SearchProvider>
       </body>
